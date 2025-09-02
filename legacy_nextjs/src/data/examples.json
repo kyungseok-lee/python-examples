@@ -1,0 +1,312 @@
+[
+  {
+    "id": 1,
+    "title": "Hello World",
+    "slug": "hello-world",
+    "description": "Print a greeting with type hints and f-strings (Python 3.11+).",
+    "code": "#!/usr/bin/env python3\n\"\"\"hello_world.py: Modern greeting example.\"\"\"\nfrom __future__ import annotations\n\ndef main() -> None:\n    \"\"\"Entry point\"\"\"\n    message: str = \"Hello, World!\"\n    version_info: tuple[int, int] = tuple(__import__(\"sys\").version_info[:2])\n    print(f\"{message} Running on Python {version_info[0]}.{version_info[1]}\")\n\nif __name__ == \"__main__\":\n    main()",
+    "explanation": "Defines a `main()` function with type hints and prints the running Python version using f-strings.",
+    "output": "$ python3 hello_world.py\nHello, World! Running on Python 3.11",
+    "order": 1
+  },
+  {
+    "id": 2,
+    "title": "Literals",
+    "slug": "literals",
+    "description": "Numbers with underscores, raw strings, f-strings, booleans and None (Python 3.11).",
+    "code": "#!/usr/bin/env python3\n\"\"\"literals.py: Demonstrate modern literals.\"\"\"\n# Numeric literals with underscores\nmillion: int = 1_000_000\nhex_val: int = 0x_FF\nbin_val: int = 0b1010_1010\nprint(f\"Million: {million}, Hex: {hex_val}, Binary: {bin_val}\")\n\n# Raw string and f-string self-documenting\nraw: str = r\"C:\\\\Users\\\\Name\"\nf_string: str = f\"Version: {3.11}\"  # self-documenting expression\nprint(f\"Raw: {raw}\\nFormatted: {f_string}\")\n\n# Boolean and None\nprint(f\"True and False: {True and False}, None: {None}\")",
+    "explanation": "Shows numeric literals with underscores, raw strings, self-documenting f-strings, and the built-in booleans and None.",
+    "output": "Million: 1000000, Hex: 255, Binary: 170\nRaw: C:\\Users\\Name\nFormatted: Version: 3.11\nTrue and False: False, None: None",
+    "order": 2
+  },
+  {
+    "id": 3,
+    "title": "Variables",
+    "slug": "variables",
+    "description": "Dynamic typing, multiple assignment, and the walrus operator (`:=`).",
+    "code": "#!/usr/bin/env python3\n\"\"\"variables.py: Assignment examples including walrus.\"\"\"\n# Traditional assignment\na: str = \"initial\"\n# Walrus operator (PEP 572)\nif (length := len(a)) > 0:\n    print(f\"Variable 'a' length is {length}\")\n# Multiple assignment\nx, y, z = 1, 2, 3\nprint(f\"x={x}, y={y}, z={z}\")",
+    "explanation": "Demonstrates dynamic typing, the `:=` walrus operator to assign inside an expression, and multiple assignment.",
+    "output": "Variable 'a' length is 7\nx=1, y=2, z=3",
+    "order": 3
+  },
+  {
+    "id": 4,
+    "title": "Constants",
+    "slug": "constants",
+    "description": "Declaring constants with `typing.Final` (Python 3.8+).",
+    "code": "from typing import Final\n\nPI: Final[float] = 3.14159\nMAX_RETRIES: Final[int] = 5\nprint(f\"PI: {PI}, MAX_RETRIES: {MAX_RETRIES}\")",
+    "explanation": "Uses `typing.Final` to indicate that variables are intended to be constants and should not be reassigned.",
+    "output": "PI: 3.14159, MAX_RETRIES: 5",
+    "order": 4
+  },
+  {
+    "id": 5,
+    "title": "For Loops",
+    "slug": "for-loops",
+    "description": "Basic `for` loops, list comprehensions, and generator expressions.",
+    "code": "#!/usr/bin/env python3\n\"\"\"for_loops.py: Modern looping constructs.\"\"\"\n# Basic range loop\nfor i in range(1, 4):\n    print(i)\n\n# List comprehension\nsquares = [x**2 for x in range(5)]\nprint(f\"Squares: {squares}\")\n\n# Generator expression\nsum_gen = sum(x**2 for x in range(5))\nprint(f\"Sum of squares: {sum_gen}\")",
+    "explanation": "Illustrates `for` loops over ranges, list comprehensions for building lists, and generator expressions for memory-efficient aggregation.",
+    "output": "1\n2\n3\nSquares: [0, 1, 4, 9, 16]\nSum of squares: 30",
+    "order": 5
+  },
+  {
+    "id": 6,
+    "title": "If / Else & Ternary",
+    "slug": "if-else",
+    "description": "Conditional statements, ternary expressions, and structural pattern matching (Python 3.10+).",
+    "code": "#!/usr/bin/env python3\n\"\"\"if_else.py: Conditional logic and match-case.\"\"\"\n# Ternary expression\nnum = 7\nprint(f\"{num} is { 'even' if num % 2 == 0 else 'odd' }\")\n\n# match-case (PEP 634)\nstatus = 'error'\nmatch status:\n    case 'ok':\n        print('All good')\n    case 'error':\n        print('An error occurred')\n    case _:\n        print('Unknown status')",
+    "explanation": "Shows the inline ternary operator for simple conditions and `match/case` for richer structural pattern matching.",
+    "output": "7 is odd\nAn error occurred",
+    "order": 6
+  },
+  {
+    "id": 7,
+    "title": "Pattern Matching",
+    "slug": "pattern-matching",
+    "description": "Advanced use of `match/case` with data classes (Python 3.10+).",
+    "code": "#!/usr/bin/env python3\n\"\"\"pattern_matching.py: Advanced match examples.\"\"\"\nfrom dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: int\n    y: int\n\n\ndef describe(obj):\n    match obj:\n        case Point(x=0, y=0):\n            return \"Origin\"\n        case Point(x, y) if x == y:\n            return \"Diagonal\"\n        case Point(x, y):\n            return f\"Point at {x},{y}\"\n        case _:\n            return \"Not a point\"\n\nprint(describe(Point(0,0)))\nprint(describe(Point(2,2)))\nprint(describe(Point(3,4)))",
+    "explanation": "Combines `@dataclass` with `match/case` to elegantly destructure and inspect objects based on their attributes.",
+    "output": "Origin\nDiagonal\nPoint at 3,4",
+    "order": 7
+  },
+  {
+    "id": 8,
+    "title": "Lists & Comprehensions",
+    "slug": "lists",
+    "description": "Typed lists, append/insert, slicing, nested comprehensions.",
+    "code": "#!/usr/bin/env python3\n\"\"\"lists.py: Typed lists and comprehensions.\"\"\"\nfrom typing import List\n\nfruits: List[str] = ['apple', 'banana', 'cherry']\nfruits.append('date')\nprint(fruits)\n\n# List slicing and step\nprint(fruits[1:4])\nprint(fruits[::-1])\n\n# Nested comprehension\nmatrix = [[i * j for j in range(3)] for i in range(3)]\nprint(matrix)",
+    "explanation": "Demonstrates typed lists with `List[str]`, the `append` method, slicing with steps, and nested list comprehensions.",
+    "output": "['apple', 'banana', 'cherry', 'date']\n['banana', 'cherry', 'date']\n['date', 'cherry', 'banana', 'apple']\n[[0, 0, 0], [0, 1, 2], [0, 2, 4]]",
+    "order": 8
+  },
+  {
+    "id": 9,
+    "title": "Tuples & NamedTuple",
+    "slug": "tuples",
+    "description": "Immutable sequences and named tuples for field access.",
+    "code": "#!/usr/bin/env python3\n\"\"\"tuples.py: Immutable sequences.\"\"\"\nfrom typing import NamedTuple\n\nclass PointNT(NamedTuple):\n    x: int\n    y: int\n\np: tuple[int, int] = (10, 20)\nprint(p)\nprint(f\"x={p[0]}, y={p[1]}\")\n\np2 = PointNT(3, 4)\nprint(p2)\nprint(f\"NamedTuple x={p2.x}, y={p2.y}\")",
+    "explanation": "Compares regular tuples with `NamedTuple` to show how named fields improve readability.",
+    "output": "(10, 20)\nx=10, y=20\nPointNT(x=3, y=4)\nNamedTuple x=3, y=4",
+    "order": 9
+  },
+  {
+    "id": 10,
+    "title": "List Slicing & slice",
+    "slug": "list-slicing",
+    "description": "Using the `slice` object for advanced slicing patterns.",
+    "code": "#!/usr/bin/env python3\n\"\"\"list_slicing.py: Advanced slicing.\"\"\"\nnumbers = list(range(10))\nprint(numbers)\n\n# Built-in slice object\ns1 = slice(2, 7, 2)\nprint(numbers[s1])  # [2, 4, 6]\n\n# Reverse using slice\nprint(numbers[::-1])",
+    "explanation": "Uses `slice(start, stop, step)` to programmatically slice sequences and shows reversing with `[::-1]`.",
+    "output": "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n[2, 4, 6]\n[9, 8, 7, 6, 5, 4, 3, 2, 1, 0]",
+    "order": 10
+  },
+  {
+    "id": 11,
+    "title": "Dictionaries",
+    "slug": "dictionaries",
+    "description": "Using the dict union operator (`|`) and dict comprehensions.",
+    "code": "#!/usr/bin/env python3\n\"\"\"dictionaries.py: Modern dict usage.\"\"\"\na = {'x': 1, 'y': 2}\nb = {'y': 3, 'z': 4}\nmerged = a | b\nprint(f\"Merged: {merged}\")  # {'x': 1, 'y': 3, 'z': 4}\n\n# Dict comprehension with condition\nsquares = {i: i*i for i in range(5) if i % 2 == 0}\nprint(f\"Even squares: {squares}\")",
+    "explanation": "The `dict | dict` operator merges two dictionaries, with values from the right-hand dict overriding on conflicts (PEP 584).",
+    "output": "Merged: {'x': 1, 'y': 3, 'z': 4}\nEven squares: {0: 0, 2: 4, 4: 16}",
+    "order": 11
+  },
+  {
+    "id": 12,
+    "title": "Functions",
+    "slug": "functions",
+    "description": "Position-only parameters, variadic args, keyword-only args, and advanced typing.",
+    "code": "#!/usr/bin/env python3\n\"\"\"functions.py: Advanced function definitions.\"\"\"\nfrom typing import Callable, ParamSpec, TypeVar\n\nP = ParamSpec('P')\nT = TypeVar('T')\n\ndef wrapper(func: Callable[P, T], /, *args: P.args, **kwargs: P.kwargs) -> T:\n    \"\"\"Wraps and calls any function, printing its name first.\"\"\"\n    print(f\"Calling {func.__name__}\")\n    return func(*args, **kwargs)\n\ndef greet(name: str, greeting: str = 'Hi', /) -> str:\n    return f\"{greeting}, {name}!\"\n\nprint(wrapper(greet, 'Alice'))",
+    "explanation": "Uses the `/` marker for position-only parameters and PEP 612 `ParamSpec` to accept arbitrary argument signatures.",
+    "output": "Calling greet\nHi, Alice!",
+    "order": 12
+  },
+  {
+    "id": 13,
+    "title": "Multiple Return Values",
+    "slug": "multiple-return-values",
+    "description": "Tuple unpacking combined with structural pattern matching.",
+    "code": "#!/usr/bin/env python3\n\"\"\"multi_return.py: Tuple unpacking with pattern matching.\"\"\"\ndef stats(nums: list[int]) -> tuple[int, int]:\n    return len(nums), sum(nums)\n\nmatch stats([1, 2, 3, 4]):\n    case count, total:\n        print(f\"Count: {count}, Sum: {total}\")",
+    "explanation": "Leverages `match/case` to unpack the returned tuple and handle values clearly.",
+    "output": "Count: 4, Sum: 10",
+    "order": 13
+  },
+  {
+    "id": 14,
+    "title": "Variadic Functions",
+    "slug": "variadic-functions",
+    "description": "Using `TypedDict` with `Required` and `NotRequired` for keyword arguments.",
+    "code": "#!/usr/bin/env python3\n\"\"\"variadic.py: TypedDict example.\"\"\"\nfrom typing import TypedDict, NotRequired, Required\n\nclass Person(TypedDict):\n    name: Required[str]\n    age: NotRequired[int]\n\ndef describe(**info: Person) -> None:\n    print(info)\n\ndescribe(name='Bob')\ndescribe(name='Carol', age=30)",
+    "explanation": "With PEP 655 you can mark individual `TypedDict` fields as required or optional, improving type safety.",
+    "output": "{'name': 'Bob'}\n{'name': 'Carol', 'age': 30}",
+    "order": 14
+  },
+  {
+    "id": 15,
+    "title": "Closures",
+    "slug": "closures",
+    "description": "Method chaining in a closure-based builder using the `Self` type.",
+    "code": "#!/usr/bin/env python3\n\"\"\"closures.py: Chainable builder with Self.\"\"\"\nfrom typing import Self\n\ndef builder() -> Self:\n    class B:\n        def __init__(self):\n            self.value = 0\n        def add(self, x: int) -> Self:\n            self.value += x\n            return self\n        def build(self) -> int:\n            return self.value\n    return B()\n\nobj = builder().add(5).add(3)\nprint(obj.build())",
+    "explanation": "The `Self` type hint (PEP 673) allows methods to indicate they return the same type as `self`, enabling fluent chaining.",
+    "output": "8",
+    "order": 15
+  },
+  {
+    "id": 16,
+    "title": "Recursion",
+    "slug": "recursion",
+    "description": "Adjusting recursion limits and computing factorial.",
+    "code": "#!/usr/bin/env python3\n\"\"\"recursion.py: Factorial with recursion limit adjustment.\"\"\"\nimport sys\nsys.setrecursionlimit(2000)\n\ndef fact(n: int) -> int:\n    return 1 if n == 0 else n * fact(n-1)\n\nprint(fact(10))",
+    "explanation": "For deep recursive calls, use `sys.setrecursionlimit()` to increase the maximum recursion depth safely.",
+    "output": "3628800",
+    "order": 16
+  },
+  {
+    "id": 17,
+    "title": "Iteration",
+    "slug": "iteration",
+    "description": "Implementing a custom iterator with `__iter__` and `__next__`.",
+    "code": "#!/usr/bin/env python3\n\"\"\"iteration.py: Custom iterator example.\"\"\"\nclass CountUp:\n    def __init__(self, n: int):\n        self.current = 0\n        self.n = n\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.current < self.n:\n            self.current += 1\n            return self.current\n        raise StopIteration\n\nfor i in CountUp(3):\n    print(i)",
+    "explanation": "By defining `__iter__` and `__next__`, you create an object that can be used in `for` loops like any built-in iterator.",
+    "output": "1\n2\n3",
+    "order": 17
+  },
+  {
+    "id": 18,
+    "title": "References",
+    "slug": "references",
+    "description": "Behavior differences between mutable and immutable objects.",
+    "code": "#!/usr/bin/env python3\n\"\"\"references.py: Mutable vs. immutable objects.\"\"\"\n# Immutable example\na = 1\nb = a\nb = 2\nprint(a)  # still 1\n\n# Mutable example\nlst = [1]\nlst2 = lst\nlst2.append(2)\nprint(lst)  # [1, 2]",
+    "explanation": "Immutable objects (like ints) can’t be changed in place, whereas mutable objects share references and can be modified.",
+    "output": "1\n[1, 2]",
+    "order": 18
+  },
+  {
+    "id": 19,
+    "title": "Strings and Unicode",
+    "slug": "strings-unicode",
+    "description": "Using `removeprefix`, `removesuffix`, and Unicode character names.",
+    "code": "#!/usr/bin/env python3\n\"\"\"strings.py: New string methods and Unicode.\"\"\"\ns = \"--hello--\"\nprint(s.removeprefix(\"--\").removesuffix(\"--\"))\nprint(\"Snowman: \\N{SNOWMAN}\")",
+    "explanation": "Python 3.9+ adds `str.removeprefix()` and `str.removesuffix()`; Unicode names (e.g. `\\N{SNOWMAN}`) work by default.",
+    "output": "hello\nSnowman: ☃",
+    "order": 19
+  },
+  {
+    "id": 20,
+    "title": "Classes",
+    "slug": "classes",
+    "description": "Data classes with `__slots__` for memory efficiency.",
+    "code": "#!/usr/bin/env python3\n\"\"\"classes.py: Dataclass with slots.\"\"\"\nfrom dataclasses import dataclass\n\n@dataclass(slots=True)\nclass Point:\n    x: int\n    y: int\n\np = Point(3, 4)\nprint(p)",
+    "explanation": "Declaring `@dataclass(slots=True)` reduces per-instance memory overhead by preventing the creation of `__dict__`.",
+    "output": "Point(x=3, y=4)",
+    "order": 20
+  },
+  {
+    "id": 21,
+    "title": "Methods",
+    "slug": "methods",
+    "description": "Using `cached_property` to cache expensive computations.",
+    "code": "#!/usr/bin/env python3\n\"\"\"methods.py: cached_property example.\"\"\"\nfrom functools import cached_property\n\nclass Expensive:\n    @cached_property\n    def value(self) -> int:\n        print(\"Computing...\")\n        return sum(range(100_000))\n\nobj = Expensive()\nprint(obj.value)\nprint(obj.value)",
+    "explanation": "`cached_property` (Python 3.8+) runs the method once and reuses the result thereafter, avoiding repeated work.",
+    "output": "Computing...\n4999950000\n4999950000",
+    "order": 21
+  },
+  {
+    "id": 22,
+    "title": "Duck Typing",
+    "slug": "duck-typing",
+    "description": "Using `Protocol` and `@runtime_checkable` for structural subtyping.",
+    "code": "#!/usr/bin/env python3\n\"\"\"duck_typing.py: Protocol example.\"\"\"\nfrom typing import Protocol, runtime_checkable\n\n@runtime_checkable\nclass Quacks(Protocol):\n    def quack(self) -> str: ...\n\nclass Duck:\n    def quack(self) -> str:\n        return \"Quack!\"\n\nprint(isinstance(Duck(), Quacks))",
+    "explanation": "PEP 544’s `Protocol` allows you to define an interface; `@runtime_checkable` makes `isinstance()` checks possible.",
+    "output": "True",
+    "order": 22
+  },
+  {
+    "id": 23,
+    "title": "Enums",
+    "slug": "enums",
+    "description": "Using `StrEnum` to have enums whose members are also strings.",
+    "code": "#!/usr/bin/env python3\n\"\"\"enums.py: StrEnum example.\"\"\"\nfrom enum import StrEnum\n\nclass Color(StrEnum):\n    RED = 'red'\n    GREEN = 'green'\n    BLUE = 'blue'\n\nprint(Color.RED, Color.RED.value)",
+    "explanation": "Python 3.11 introduced `StrEnum`, which combines `Enum` with string behavior.",
+    "output": "Color.RED red",
+    "order": 23
+  },
+  {
+    "id": 24,
+    "title": "Inheritance",
+    "slug": "inheritance",
+    "description": "Multiple inheritance and proper use of `super()`.",
+    "code": "#!/usr/bin/env python3\n\"\"\"inheritance.py: Multiple inheritance example.\"\"\"\nclass A:\n    pass\nclass B:\n    pass\nclass C(A, B):\n    def __init__(self):\n        super().__init__()\n        print('Initialized C')\n\nC()",
+    "explanation": "`super()` follows the method resolution order (MRO) to call parent constructors correctly in multiple inheritance scenarios.",
+    "output": "Initialized C",
+    "order": 24
+  },
+  {
+    "id": 25,
+    "title": "Generics",
+    "slug": "generics",
+    "description": "Declaring a generic alias using PEP 695 syntax (Python 3.12+).",
+    "code": "#!/usr/bin/env python3\n\"\"\"generics.py: Generic alias syntax.\"\"\"\nfrom typing import TypeVar\n\nT = TypeVar('T')\n\ntype Stack[T] = list[T]\n\ns: Stack[int] = []\ns.append(5)\nprint(s.pop())",
+    "explanation": "With PEP 695 you can write `type Name[T] = ...` to create a generic alias directly.",
+    "output": "5",
+    "order": 25
+  },
+  {
+    "id": 26,
+    "title": "Iterators",
+    "slug": "iterators",
+    "description": "List comprehension performance improvements (PEP 709).",
+    "code": "#!/usr/bin/env python3\n\"\"\"iterators.py: Comprehension inlining.\"\"\"\n# Python 3.12’s PEP 709 optimizes comprehension execution\nsquares = [i * i for i in range(5)]\nprint(squares)",
+    "explanation": "PEP 709 inlines comprehension loops for faster execution in Python 3.12.",
+    "output": "[0, 1, 4, 9, 16]",
+    "order": 26
+  },
+  {
+    "id": 27,
+    "title": "Exceptions",
+    "slug": "exceptions",
+    "description": "Exception groups and the `except*` syntax, plus adding notes to exceptions.",
+    "code": "#!/usr/bin/env python3\n\"\"\"exceptions.py: ExceptionGroup example.\"\"\"\nfrom asyncio import ExceptionGroup\n\ndef f():\n    raise ExceptionGroup('group', [ValueError('v'), TypeError('t')])\n\ntry:\n    f()\nexcept* ValueError as e:\n    e.add_note('Handled a ValueError')\n    print(e)",
+    "explanation": "PEP 654 adds `ExceptionGroup` and `except*` to catch multiple exceptions together; PEP 678 lets you attach notes with `add_note()`.",
+    "output": "ExceptionGroup('group', [ValueError('v')])",
+    "order": 27
+  },
+  {
+    "id": 28,
+    "title": "Custom Exceptions",
+    "slug": "custom-exceptions",
+    "description": "Extending `Exception` and using `add_note()` for context.",
+    "code": "#!/usr/bin/env python3\n\"\"\"custom_exceptions.py: add_note() usage.\"\"\"\nclass MyError(Exception):\n    def __init__(self, msg):\n        super().__init__(msg)\n        self.add_note('Check location of error')\n\ntry:\n    raise MyError('Something went wrong')\nexcept MyError as e:\n    print(e)\n    print(e.__notes__)",
+    "explanation": "`Exception.add_note()` (PEP 678) lets you attach additional context to exceptions.",
+    "output": "Something went wrong\n['Check location of error']",
+    "order": 28
+  },
+  {
+    "id": 29,
+    "title": "Threads",
+    "slug": "threads",
+    "description": "Managing async tasks with `asyncio.TaskGroup` (Python 3.11+).",
+    "code": "#!/usr/bin/env python3\n\"\"\"threads.py: asyncio TaskGroup example.\"\"\"\nimport asyncio\n\nasync def work(name):\n    print(f\"Start {name}\")\n    await asyncio.sleep(0.1)\n    print(f\"End {name}\")\n\nasync def main():\n    async with asyncio.TaskGroup() as tg:\n        tg.create_task(work('A'))\n        tg.create_task(work('B'))\n\nasyncio.run(main())",
+    "explanation": "PEP 654 introduces `asyncio.TaskGroup` to group coroutines and wait for all to finish.",
+    "output": "Start A\nStart B\nEnd A\nEnd B",
+    "order": 29
+  },
+  {
+    "id": 30,
+    "title": "Coroutines",
+    "slug": "coroutines",
+    "description": "Multiline and commented expressions inside f-strings (PEP 701).",
+    "code": "#!/usr/bin/env python3\n\"\"\"coroutines.py: Multiline f-strings.\"\"\"\nsongs = ['a', 'b', 'c']\nmsg = f\"\"\"Playlist:\\n{', '.join([\n    s for s in songs  # inline expression in f-string\n])}\"\"\"\nprint(msg)",
+    "explanation": "PEP 701 (Python 3.12) allows multiline expressions and comments inside f-strings for clearer formatting.",
+    "output": "Playlist:\na, b, c",
+    "order": 30
+  },
+  {
+    "id": 31,
+    "title": "Custom Errors",
+    "slug": "custom-errors",
+    "description": "Loading config with `tomllib` and raising exception groups.",
+    "code": "#!/usr/bin/env python3\n\"\"\"custom_errors.py: tomllib + ExceptionGroup.\"\"\"\nimport tomllib\nfrom asyncio import ExceptionGroup\n\nwith open('config.toml', 'rb') as f:\n    cfg = tomllib.load(f)\n\nif not cfg.get('enabled'):\n    raise ExceptionGroup('ConfigError', [ValueError('Disabled in config')])",
+    "explanation": "The `tomllib` module (Python 3.11+) parses TOML configuration files; then an `ExceptionGroup` is raised if the config flag isn’t enabled.",
+    "output": "Traceback (most recent call last):\nExceptionGroup('ConfigError', [ValueError('Disabled in config')])",
+    "order": 31
+  }
+]

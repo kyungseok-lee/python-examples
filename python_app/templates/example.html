@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ e.title }} • Python by Example{% endblock %}
+{% block content %}
+<a href="{{ url_for('index') }}" class="back">← Back</a>
+<h1>{{ e.title }}</h1>
+<p class="desc">{{ e.description }}</p>
+
+<div class="code-actions">
+  <button id="code-block-btn" class="btn" onclick="copyToClipboard('code-block')">Copy Code</button>
+  <!-- Placeholder for potential 'Run in browser' integration -->
+  <!-- <button class="btn btn-secondary">Run</button> -->
+  </div>
+
+<pre class="language-python"><code id="code-block" class="language-python">{{ e.code }}</code></pre>
+
+{% if e.explanation %}
+  <h2>Explanation</h2>
+  <p>{{ e.explanation }}</p>
+{% endif %}
+
+{% if e.output %}
+  <h2>Output</h2>
+  <pre><code>{{ e.output }}</code></pre>
+{% endif %}
+{% endblock %}
+

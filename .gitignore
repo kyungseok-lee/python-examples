@@ -35,3 +35,15 @@ coverage/
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.coverage
+dist/
+build/
