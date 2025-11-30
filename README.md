@@ -95,22 +95,67 @@ Python의 심화 기능과 성능 최적화를 다룹니다.
 3. **문서 확인**: 코드 내 주석과 docstring을 꼼꼼히 읽으세요.
 4. **테스트 작성**: 학습한 내용을 테스트 코드로 검증하세요.
 
-## 📦 환경 설정
+## 🚀 빠른 시작 (초심자용)
+
+### 1. Python 설치 확인
+```bash
+python --version  # 3.11 이상 권장
+# Windows에서 안되면: py --version
+# macOS/Linux에서 안되면: python3 --version
+```
+
+Python이 없다면? → **[상세 설치 가이드 보기](SETUP.md)**
+
+### 2. 프로젝트 시작
 
 ```bash
-# Python 3.11+ 권장
-python --version
+# 1) 프로젝트 클론
+git clone https://github.com/kyungseok-lee/python-by-examples.git
+cd python-by-examples
 
-# 가상환경 생성
+# 2) 가상환경 설정 (선택사항이지만 권장)
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 의존성 설치 (각 섹션별로 필요한 패키지 설치)
-pip install -r 01-basics/requirements.txt
-pip install -r 02-intermediate/requirements.txt
-pip install -r 03-advanced/requirements.txt
-pip install -r 04-backend-expert/requirements.txt
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+
+# 3) 첫 예제 실행 (의존성 설치 불필요!)
+cd 01-basics
+python 01_variables_and_types.py
 ```
+
+### 3. 전체 예제 실행
+```bash
+# 기본 문법 전체 실행
+cd 01-basics
+python run_all.py
+```
+
+### 4. FastAPI 서버 실행 (백엔드 과정)
+```bash
+cd 04-backend-expert
+pip install -r requirements.txt
+uvicorn 01_fastapi_basics:app --reload
+
+# 브라우저에서 열기: http://localhost:8000/docs
+```
+
+**문제가 있나요?** → **[문제 해결 가이드 보기](SETUP.md#6-문제-해결)**
+
+## 📦 환경 설정 (상세)
+
+상세한 환경 설정은 **[SETUP.md](SETUP.md)** 파일을 참고하세요.
+
+**포함 내용:**
+- ✅ Python 설치 (Windows/macOS/Linux)
+- ✅ IDE 설정 (VS Code/PyCharm)
+- ✅ 가상환경 생성 및 활성화
+- ✅ 의존성 설치
+- ✅ 문제 해결 가이드
+- ✅ 학습 로드맵
 
 ## 🎯 학습 목표
 
