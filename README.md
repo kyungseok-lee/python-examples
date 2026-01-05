@@ -2,6 +2,14 @@
 
 Python 백엔드 전문가가 되기 위한 체계적인 학습 프로젝트입니다.
 
+## 🔧 기술 스택
+
+- **Python**: 3.12+ (LTS)
+- **Web Framework**: FastAPI 0.115+
+- **Data Validation**: Pydantic v2.10+
+- **Database**: SQLAlchemy 2.0+
+- **Testing**: pytest 8.3+
+
 ## 📚 커리큘럼 구성
 
 ### 01. 기본 문법 (Basics)
@@ -31,77 +39,25 @@ Python의 기초를 탄탄히 다지는 단계입니다.
 ### 03. 고급 개념 (Advanced)
 Python의 심화 기능과 성능 최적화를 다룹니다.
 
-- **01_async_programming**: async/await, asyncio, aiohttp
+- **01_async_programming**: async/await, asyncio
 - **02_multithreading**: threading, concurrent.futures
-- **03_multiprocessing**: Process, Pool, 프로세스 간 통신
-- **04_metaclasses**: type, metaclass, 클래스 생성 제어
-- **05_descriptors**: property, __get__/__set__/__delete__
-- **06_type_hints**: typing, Protocol, Generic, TypeVar
-- **07_dataclasses**: @dataclass, field, post_init
-- **08_performance**: profiling, cProfile, memory_profiler
-- **09_testing**: pytest, fixtures, mocking, parametrize
+- **03_type_hints**: Python 3.12+ 타입 힌트, Protocol, Generic
+- **04_dataclasses**: @dataclass, slots, frozen
+- **05_testing**: pytest, fixtures, mocking
 
 ### 04. 백엔드 전문가 (Backend Expert)
 실전 백엔드 개발에 필요한 모든 기술을 마스터합니다.
 
 #### API 개발
 - **01_fastapi_basics**: FastAPI 기본, 라우팅, 요청/응답
-- **02_pydantic_models**: 데이터 검증, BaseModel, 시리얼라이제이션
-- **03_dependency_injection**: Depends, 의존성 주입 패턴
-- **04_middleware**: 미들웨어 작성, CORS, 인증
-- **05_background_tasks**: BackgroundTasks, Celery
+- **02_pydantic_models**: Pydantic v2, 데이터 검증, 시리얼라이제이션
+- **03_clean_architecture**: 계층 분리, 의존성 역전, Protocol
 
-#### 데이터베이스
-- **06_sqlalchemy_core**: Core API, 테이블 정의, 쿼리
-- **07_sqlalchemy_orm**: ORM, 관계, 세션 관리
-- **08_alembic_migrations**: 마이그레이션 관리
-- **09_redis_caching**: Redis 연동, 캐싱 전략
-- **10_mongodb**: Motor, 비동기 MongoDB 연동
-
-#### 아키텍처 패턴
-- **11_clean_architecture**: 계층 분리, 의존성 역전
-- **12_repository_pattern**: Repository, Unit of Work
-- **13_service_layer**: 비즈니스 로직 분리
-- **14_ddd_patterns**: Entity, Value Object, Aggregate
-
-#### 메시징 & 이벤트
-- **15_rabbitmq**: pika, 메시지 큐 패턴
-- **16_kafka**: aiokafka, 이벤트 스트리밍
-- **17_event_driven**: 이벤트 기반 아키텍처
-
-#### 보안 & 인증
-- **18_jwt_auth**: JWT 토큰, 인증/인가
-- **19_oauth2**: OAuth2 플로우, 소셜 로그인
-- **20_security**: 보안 헤더, rate limiting, CSRF
-
-#### 테스팅 & 모니터링
-- **21_integration_testing**: 통합 테스트, TestClient
-- **22_e2e_testing**: End-to-End 테스트
-- **23_logging**: structlog, 로깅 전략
-- **24_monitoring**: Prometheus, Grafana 연동
-- **25_tracing**: OpenTelemetry, 분산 추적
-
-#### 배포 & 운영
-- **26_docker**: Dockerfile, docker-compose
-- **27_kubernetes**: K8s 배포, 헬스체크
-- **28_ci_cd**: GitHub Actions, Jenkins
-- **29_graceful_shutdown**: 무중단 배포, signal handling
-- **30_performance_tuning**: 성능 최적화, 병목 분석
-
-## 🚀 학습 방법
-
-1. **순차적 학습**: 01부터 04까지 순서대로 학습하세요.
-2. **실습 중심**: 각 예제를 직접 실행하고 수정해보세요.
-3. **문서 확인**: 코드 내 주석과 docstring을 꼼꼼히 읽으세요.
-4. **테스트 작성**: 학습한 내용을 테스트 코드로 검증하세요.
-
-## 🚀 빠른 시작 (초심자용)
+## 🚀 빠른 시작
 
 ### 1. Python 설치 확인
 ```bash
-python --version  # 3.11 이상 권장
-# Windows에서 안되면: py --version
-# macOS/Linux에서 안되면: python3 --version
+python --version  # 3.12 이상 권장
 ```
 
 Python이 없다면? → **[상세 설치 가이드 보기](SETUP.md)**
@@ -113,7 +69,7 @@ Python이 없다면? → **[상세 설치 가이드 보기](SETUP.md)**
 git clone https://github.com/kyungseok-lee/python-by-examples.git
 cd python-by-examples
 
-# 2) 가상환경 설정 (선택사항이지만 권장)
+# 2) 가상환경 설정 (권장)
 python -m venv venv
 
 # Windows
@@ -143,41 +99,72 @@ uvicorn 01_fastapi_basics:app --reload
 # 브라우저에서 열기: http://localhost:8000/docs
 ```
 
-**문제가 있나요?** → **[문제 해결 가이드 보기](SETUP.md#6-문제-해결)**
-
-## 📦 환경 설정 (상세)
+## 📦 환경 설정
 
 상세한 환경 설정은 **[SETUP.md](SETUP.md)** 파일을 참고하세요.
 
-**포함 내용:**
-- ✅ Python 설치 (Windows/macOS/Linux)
-- ✅ IDE 설정 (VS Code/PyCharm)
-- ✅ 가상환경 생성 및 활성화
-- ✅ 의존성 설치
-- ✅ 문제 해결 가이드
-- ✅ 학습 로드맵
+## 🎯 Python 3.12+ 주요 특징
 
-## 🎯 학습 목표
+이 프로젝트는 Python 3.12+ 스타일을 적용합니다:
 
-이 프로젝트를 완료하면 다음을 할 수 있습니다:
+### 타입 힌트
+```python
+# Python 3.9+: 내장 타입 사용
+def process(items: list[int]) -> dict[str, int]:
+    ...
 
-- ✅ Python 언어의 모든 핵심 기능을 마스터
-- ✅ FastAPI로 프로덕션급 REST API 개발
-- ✅ SQLAlchemy를 활용한 복잡한 데이터 모델링
-- ✅ Clean Architecture와 DDD 패턴 적용
-- ✅ 비동기 프로그래밍과 성능 최적화
-- ✅ 메시지 큐와 이벤트 드리븐 아키텍처 구현
-- ✅ 테스트 자동화와 CI/CD 파이프라인 구축
-- ✅ Docker/Kubernetes 기반 배포
-- ✅ 모니터링과 로깅 시스템 구축
+# Python 3.10+: 유니온 문법
+def find(id: int) -> User | None:
+    ...
+
+# Python 3.12+: type 키워드 (PEP 695)
+type Vector = list[float]
+```
+
+### 메모리 최적화 (GC 관점)
+```python
+from dataclasses import dataclass
+
+# __slots__ 사용으로 메모리 절약
+@dataclass(slots=True)
+class User:
+    id: int
+    name: str
+    email: str
+```
+
+### Pydantic v2
+```python
+from pydantic import BaseModel, ConfigDict, field_validator
+
+class User(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    
+    name: str
+    email: str
+    
+    @field_validator('name')
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        if len(v) < 2:
+            raise ValueError('Name too short')
+        return v
+```
+
+## 🔬 GC/메모리 최적화 포인트
+
+1. **`__slots__` 사용**: 클래스에서 `__dict__` 대신 `__slots__` 사용
+2. **제너레이터 활용**: 대용량 데이터 처리 시 메모리 효율적
+3. **불변 객체 선호**: `frozen=True` 데이터클래스 사용
+4. **Protocol 사용**: ABC 대신 구조적 서브타이핑
+5. **gc 모듈 활용**: 성능 크리티컬 구간에서 GC 제어
 
 ## 📖 추가 학습 자료
 
-- [Python 공식 문서](https://docs.python.org/3/)
-- [FastAPI 공식 문서](https://fastapi.tiangolo.com/)
-- [SQLAlchemy 공식 문서](https://docs.sqlalchemy.org/)
-- [Real Python](https://realpython.com/)
-- [Awesome Python](https://github.com/vinta/awesome-python)
+- [Python 3.12 What's New](https://docs.python.org/3/whatsnew/3.12.html)
+- [Pydantic v2 Documentation](https://docs.pydantic.dev/latest/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Python Memory Management](https://docs.python.org/3/c-api/memory.html)
 
 ## 🤝 기여
 

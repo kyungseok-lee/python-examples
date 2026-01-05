@@ -14,12 +14,14 @@ Python 초심자를 위한 단계별 환경 설정 가이드입니다.
 
 ## 1. Python 설치
 
+> **권장 버전**: Python 3.12+ (LTS)
+
 ### Windows
 
 #### 방법 1: 공식 웹사이트에서 설치 (권장)
 
 1. [Python 공식 웹사이트](https://www.python.org/downloads/) 접속
-2. "Download Python 3.11.x" 버튼 클릭 (3.11 이상 권장)
+2. "Download Python 3.12.x" 버튼 클릭
 3. 다운로드한 설치 파일 실행
 4. ⚠️ **중요**: "Add Python to PATH" 체크박스 반드시 선택!
 5. "Install Now" 클릭
@@ -28,10 +30,10 @@ Python 초심자를 위한 단계별 환경 설정 가이드입니다.
 ```cmd
 # 명령 프롬프트(cmd) 또는 PowerShell 실행
 python --version
-# 출력 예: Python 3.11.6
+# 출력 예: Python 3.12.x
 
 pip --version
-# 출력 예: pip 23.3.1 from ...
+# 출력 예: pip 24.x from ...
 ```
 
 ### macOS
@@ -43,7 +45,7 @@ pip --version
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Python 설치
-brew install python@3.11
+brew install python@3.12
 
 # 확인
 python3 --version
@@ -62,7 +64,7 @@ sudo apt update
 sudo apt upgrade -y
 
 # Python 설치
-sudo apt install python3.11 python3.11-venv python3-pip -y
+sudo apt install python3.12 python3.12-venv python3-pip -y
 
 # 확인
 python3 --version
@@ -80,15 +82,17 @@ pip3 --version
 3. 확장 프로그램 설치:
    - Python (Microsoft)
    - Pylance (Microsoft)
+   - Ruff (Astral Software) - 린터/포매터
 
 ### PyCharm Community (무료)
 
 1. [PyCharm Community 다운로드](https://www.jetbrains.com/pycharm/download/)
 2. 설치 및 실행
 
-### 터미널/명령창만 사용 (가장 간단)
+### Cursor (AI 지원)
 
-IDE 없이 텍스트 에디터 + 터미널로도 충분히 학습 가능합니다!
+1. [Cursor 다운로드](https://cursor.sh/)
+2. AI 기반 코드 완성 지원
 
 ---
 
@@ -175,20 +179,6 @@ cd 01-basics
 python 01_variables_and_types.py
 ```
 
-📝 **예상 출력:**
-```
-==================================================
-  🐍 Python 기본 문법 - 변수와 자료형
-==================================================
-
-==================================================
-1. 변수 선언과 할당
-==================================================
-언어: Python
-버전: 3.11
-...
-```
-
 ### 5-2. 모든 예제 순차 실행
 
 ```bash
@@ -196,16 +186,10 @@ python 01_variables_and_types.py
 python run_all.py
 ```
 
-각 예제가 순차적으로 실행되며, Enter 키를 눌러 다음으로 진행할 수 있습니다.
-
-### 5-3. 중급/고급 과정 (의존성 설치 필요)
+### 5-3. 고급 과정 (의존성 설치 필요)
 
 ```bash
-# 중급 과정
-cd ../02-intermediate
-python 01_decorators.py
-
-# 고급 과정 (의존성 설치 필요)
+# 고급 과정 (pytest 등)
 cd ../03-advanced
 pip install -r requirements.txt
 python 01_async_programming.py
@@ -286,14 +270,17 @@ venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-### 문제 5: 한글이 깨져 보입니다
+### 문제 5: Pydantic 관련 오류
 
-**Windows CMD:**
-```cmd
-chcp 65001
+이 프로젝트는 **Pydantic v2**를 사용합니다. v1과 호환되지 않는 문법이 있습니다.
+
+```bash
+# Pydantic 버전 확인
+pip show pydantic
+
+# 업그레이드
+pip install --upgrade pydantic
 ```
-
-**더 나은 방법:** VS Code 터미널 사용 (UTF-8 기본 지원)
 
 ### 문제 6: 포트가 이미 사용 중입니다 (FastAPI)
 
@@ -324,7 +311,7 @@ cd 02-intermediate
 ```bash
 cd 03-advanced
 pip install -r requirements.txt
-# 비동기, 멀티스레딩 등
+# 비동기, 타입 힌트, 데이터클래스 등
 ```
 
 ### 4주차: 백엔드 개발
@@ -338,7 +325,7 @@ pip install -r requirements.txt
 
 ## 🎯 빠른 시작 체크리스트
 
-- [ ] Python 3.11+ 설치 완료
+- [ ] Python 3.12+ 설치 완료
 - [ ] `python --version` 명령어 작동 확인
 - [ ] 프로젝트 클론 완료
 - [ ] 가상환경 생성 및 활성화
@@ -358,30 +345,12 @@ pip install -r requirements.txt
 2. **주석을 꼼꼼히 읽으세요**
    - 모든 코드에 한국어 설명이 있습니다
 
-3. **막히면 다시 보세요**
-   - 이해 안 되는 부분은 여러 번 반복해서 실행
+3. **타입 힌트를 활용하세요**
+   - Python 3.12+ 스타일 타입 힌트 학습
+   - IDE의 자동 완성 기능 활용
 
 4. **직접 프로젝트를 만들어보세요**
    - 학습한 내용으로 간단한 프로그램 작성
-
-5. **커뮤니티 활용**
-   - Python 공식 문서: https://docs.python.org/ko/3/
-   - 점프 투 파이썬: https://wikidocs.net/book/1
-
----
-
-## 🆘 도움이 필요하면?
-
-1. **오류 메시지를 구글에 검색**
-   - 대부분의 오류는 다른 사람도 경험했습니다
-
-2. **GitHub Issues 활용**
-   - https://github.com/kyungseok-lee/python-by-examples/issues
-
-3. **Python 커뮤니티**
-   - Stack Overflow (영어)
-   - 생활코딩 (한국어)
-   - 점프 투 파이썬 (한국어)
 
 ---
 
@@ -395,4 +364,3 @@ pip install -r requirements.txt
 4. 실습 프로젝트 만들어보기
 
 **화이팅! 🚀**
-

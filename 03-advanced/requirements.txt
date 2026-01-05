@@ -1,10 +1,13 @@
 # 03-advanced 의존성
+# Python 3.12+ 기준
 
 # 테스팅
-pytest>=7.4.0
-pytest-asyncio>=0.21.0
-pytest-cov>=4.1.0
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+pytest-cov>=5.0.0
 
 # 타입 체크
-mypy>=1.5.0
+mypy>=1.13.0
 
+# 코드 품질
+ruff>=0.8.0
