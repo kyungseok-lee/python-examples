@@ -1,42 +1,57 @@
-# Python 성능 최적화 치트시트
+# Python 성능 치트시트
 
-> 자주 사용하는 성능 팁과 패턴
+## 시간 복잡도
 
-## 리스트 vs 제너레이터
+| 자료구조 | 조회 | 삽입 | 삭제 | 검색 |
+|----------|------|------|------|------|
+| list | O(1) | O(1)* | O(n) | O(n) |
+| dict | O(1) | O(1) | O(1) | O(1) |
+| set | - | O(1) | O(1) | O(1) |
+| deque | O(n) | O(1)** | O(1)** | O(n) |
+
+*끝에 삽입 / **양끝 삽입/삭제
+
+## Comprehension vs for문
 
 ```python
-# ❌ 메모리 많이 사용
-squares = [x**2 for x in range(1000000)]
+# ✅ 더 빠름 (내부 최적화)
+squares = [x**2 for x in range(1000)]
 
-# ✅ 메모리 효율적
-squares = (x**2 for x in range(1000000))
+# ❌ 더 느림
+squares = []
+for x in range(1000):
+    squares.append(x**2)
 ```
 
-| 방식 | 메모리 | 사용 시점 |
-|------|--------|----------|
-| 리스트 | O(n) | 여러 번 순회, 인덱싱 필요 |
-| 제너레이터 | O(1) | 한 번만 순회, 대용량 |
+## Generator vs List
 
----
+```python
+# ✅ 메모리 효율적 (대용량 데이터)
+gen = (x**2 for x in range(1000000))
+
+# ❌ 메모리 많이 사용
+lst = [x**2 for x in range(1000000)]
+
+# 한 번만 순회하면 Generator
+# 여러 번 순회하면 List
+```
 
 ## 문자열 연결
 
 ```python
-# ❌ 느림 (O(n²))
+# ❌ 느림 (매번 새 객체)
 s = ""
-for item in items:
-    s += str(item)
+for word in words:
+    s += word
 
-# ✅ 빠름 (O(n))
-s = "".join(str(item) for item in items)
+# ✅ 빠름
+s = "".join(words)
 
-# ✅ f-string (가장 빠름)
-s = f"{name}: {value}"
+# ✅ f-string (가독성)
+s = f"{first} {second}"
 ```
 
----
-
-## 딕셔너리 조회
+## dict 조회 최적화
 
 ```python
 # ❌ 두 번 조회
@@ -48,162 +63,100 @@ value = d.get(key)
 if value is not None:
     ...
 
-# ✅ 기본값과 함께
-value = d.get(key, default)
-
-# ✅ setdefault (없으면 생성)
-d.setdefault(key, []).append(item)
+# ✅ 또는
+try:
+    value = d[key]
+except KeyError:
+    ...
 ```
-
----
 
 ## 멤버십 테스트
 
 ```python
-# ❌ 리스트: O(n)
-if item in large_list:
+# ❌ 느림 - O(n)
+if item in some_list:
     ...
 
-# ✅ 셋: O(1)
-large_set = set(large_list)
-if item in large_set:
+# ✅ 빠름 - O(1)
+some_set = set(some_list)
+if item in some_set:
     ...
 ```
-
----
 
 ## __slots__ 메모리 최적화
 
 ```python
-# 일반 클래스: 인스턴스당 __dict__ (동적)
+# 일반 클래스: __dict__ 사용
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-# __slots__: 인스턴스당 고정 메모리 (20-30% 절약)
+# __slots__: 메모리 절약 (~40%)
 class Point:
     __slots__ = ('x', 'y')
-    
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
-# dataclass with slots
-@dataclass(slots=True)
-class Point:
-    x: float
-    y: float
 ```
 
----
+## 프로파일링
 
-## 리스트 컴프리헨션 vs for 루프
+```bash
+# 시간 프로파일링
+python -m cProfile -s tottime script.py
 
-```python
-# for 루프
-result = []
-for x in range(1000):
-    result.append(x ** 2)
+# 라인별 프로파일링
+pip install line_profiler
+kernprof -l -v script.py
 
-# 리스트 컴프리헨션 (약 30% 빠름)
-result = [x ** 2 for x in range(1000)]
+# 메모리 프로파일링
+pip install memory_profiler
+python -m memory_profiler script.py
 ```
 
-**왜 빠른가?**
-- 컴프리헨션은 최적화된 바이트코드
-- append() 메서드 조회 오버헤드 없음
+## 동시성 선택 가이드
 
----
+```
+I/O 바운드 (네트워크, 파일):
+  → asyncio (권장)
+  → threading
+  
+CPU 바운드 (계산):
+  → multiprocessing
+  → ProcessPoolExecutor
+  
+❌ CPU 바운드에 threading 사용하지 마세요 (GIL)
+```
 
-## 함수 캐싱
+## 캐싱
 
 ```python
 from functools import lru_cache
 
-# 반복 호출 캐싱
 @lru_cache(maxsize=128)
-def fibonacci(n):
-    if n < 2:
-        return n
-    return fibonacci(n-1) + fibonacci(n-2)
+def expensive_function(n):
+    # 복잡한 계산
+    return result
 
-# 캐시 정보 확인
-fibonacci.cache_info()
+# Python 3.9+ functools.cache (무제한)
+from functools import cache
 
-# 캐시 초기화
-fibonacci.cache_clear()
+@cache
+def expensive_function(n):
+    return result
 ```
 
----
+## 주요 최적화 팁
 
-## 지역 변수가 전역보다 빠름
-
-```python
-# ❌ 전역 변수 조회
-import math
-def calc():
-    return math.sqrt(x)  # 매번 math 조회
-
-# ✅ 지역 변수로 캐싱
-def calc():
-    sqrt = math.sqrt  # 한 번만 조회
-    return sqrt(x)
-```
-
----
-
-## in 연산자 최적화
-
-```python
-# ❌ 여러 or 조건
-if x == 'a' or x == 'b' or x == 'c':
-    ...
-
-# ✅ in 사용 (더 읽기 쉽고 빠름)
-if x in ('a', 'b', 'c'):  # tuple이 set보다 작은 경우 빠름
-    ...
-
-if x in {'a', 'b', 'c', 'd', 'e'}:  # 많으면 set
-    ...
-```
-
----
-
-## 프로파일링 도구
-
-```python
-# cProfile (내장)
-import cProfile
-cProfile.run('my_function()')
-
-# line_profiler
-@profile
-def my_function():
-    ...
-# kernprof -l -v script.py
-
-# memory_profiler
-@profile
-def my_function():
-    ...
-# python -m memory_profiler script.py
-
-# timeit
-import timeit
-timeit.timeit('func()', number=10000)
-```
-
----
-
-## 성능 체크리스트
-
-| 항목 | 확인 |
-|------|------|
-| 대용량 데이터 | 제너레이터 사용? |
-| 문자열 연결 | join() 사용? |
-| 반복 조회 | 딕셔너리/셋 사용? |
-| 많은 인스턴스 | __slots__ 사용? |
-| 반복 계산 | @lru_cache 사용? |
-| 프로파일링 | 병목 지점 확인? |
+| 상황 | 최적화 |
+|------|--------|
+| 리스트 검색 많음 | set으로 변환 |
+| 문자열 연결 많음 | "".join() 사용 |
+| 대용량 데이터 순회 | Generator 사용 |
+| 함수 반복 호출 | @lru_cache 사용 |
+| CPU 집약 작업 | multiprocessing |
+| I/O 대기 많음 | asyncio |
+| 많은 객체 생성 | __slots__ 사용 |
+| 정렬 | sorted(key=) 활용 |
 

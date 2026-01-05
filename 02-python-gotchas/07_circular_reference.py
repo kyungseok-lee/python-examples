@@ -1,21 +1,20 @@
-#!/usr/bin/env python3
 """
-07_circular_reference.py - 순환 참조와 메모리 (🟡 주의)
+07_circular_reference.py - 🟡 순환 참조와 메모리
 
 📌 핵심 개념:
-   Python은 참조 카운팅 + 순환 GC를 사용합니다.
-   순환 참조가 있으면 참조 카운팅만으로는 해제되지 않고,
-   순환 GC가 실행될 때까지 메모리에 남아있습니다.
+    Python은 참조 카운팅 + 순환 GC로 메모리를 관리합니다.
+    순환 참조가 있으면 참조 카운팅만으로 해제되지 않습니다.
+    __del__ 메서드가 있으면 순환 GC도 제대로 동작하지 않을 수 있습니다.
 
 🔄 다른 언어 비교:
-   - Java: Mark & Sweep GC가 순환 참조 자동 처리
-   - Go: Tracing GC가 순환 참조 자동 처리
-   - Swift/Objective-C: ARC(참조 카운팅), weak reference로 순환 참조 방지
+    - Java: Mark & Sweep GC로 순환 참조 처리
+    - Go: Mark & Sweep GC로 순환 참조 처리
+    - Python: 참조 카운팅 + 순환 GC 조합
 
 ⚠️ 주의사항:
-   - __del__ 메서드가 있으면 순환 GC가 수집하지 못할 수 있음 (Python 3.4 이전)
-   - 대용량 객체의 순환 참조는 메모리 문제 유발
-   - weakref로 해결 가능
+    - __del__ 사용 시 순환 참조 주의
+    - weakref로 순환 참조 방지 가능
+    - 명시적으로 참조 해제하는 것이 안전
 
 📚 참고: https://docs.python.org/3/library/gc.html
 """
@@ -24,269 +23,310 @@ from __future__ import annotations
 
 import gc
 import weakref
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    pass
+from typing import Any
 
 
 # =============================================================================
 # 1️⃣ 참조 카운팅 기본
 # =============================================================================
 
-def reference_counting_basics() -> None:
-    """Python의 참조 카운팅 동작."""
-    print("=" * 60)
-    print("📌 참조 카운팅 기본")
-    print("=" * 60)
+def reference_counting_demo() -> None:
+    """
+    Python의 참조 카운팅.
     
+    💡 Java/Go 개발자를 위한 팁:
+        Java/Go는 지연된 GC를 사용합니다.
+        Python은 참조 카운트가 0이 되면 즉시 해제합니다.
+    """
     import sys
     
-    # 객체 생성 - 참조 카운트 1
-    a = [1, 2, 3]
-    print(f"a = [1, 2, 3]")
-    print(f"참조 카운트: {sys.getrefcount(a) - 1}")  # -1: getrefcount 자체가 참조
+    print("참조 카운팅:")
     
-    # 다른 변수가 참조 - 참조 카운트 증가
-    b = a
-    print(f"\nb = a")
-    print(f"참조 카운트: {sys.getrefcount(a) - 1}")
+    # 객체 생성
+    obj = [1, 2, 3]
+    print(f"  생성 직후 참조 수: {sys.getrefcount(obj) - 1}")  # -1은 getrefcount 인자
     
-    # 참조 제거 - 참조 카운트 감소
-    del b
-    print(f"\ndel b")
-    print(f"참조 카운트: {sys.getrefcount(a) - 1}")
+    # 참조 추가
+    ref1 = obj
+    print(f"  ref1 = obj 후: {sys.getrefcount(obj) - 1}")
     
-    # 참조 카운트가 0이 되면 즉시 해제
-    print("""
-    💡 참조 카운팅의 장점:
-    - 참조가 없어지면 즉시 메모리 해제
-    - 예측 가능한 메모리 관리
-    - 실시간 시스템에 유리
+    ref2 = obj
+    print(f"  ref2 = obj 후: {sys.getrefcount(obj) - 1}")
     
-    💡 참조 카운팅의 한계:
-    - 순환 참조를 처리하지 못함
-    - 순환 GC가 추가로 필요
-    """)
+    # 참조 제거
+    del ref2
+    print(f"  del ref2 후: {sys.getrefcount(obj) - 1}")
+    
+    del ref1
+    print(f"  del ref1 후: {sys.getrefcount(obj) - 1}")
+    
+    # obj가 마지막 참조 - del obj 하면 즉시 해제됨
 
 
 # =============================================================================
 # 2️⃣ 순환 참조 문제
 # =============================================================================
 
-class Node:
-    """순환 참조를 만드는 클래스."""
+def circular_reference_demo() -> None:
+    """
+    순환 참조가 발생하는 경우.
+    """
+    print("순환 참조:")
     
-    def __init__(self, name: str) -> None:
-        self.name = name
-        self.neighbor: Node | None = None
+    class Node:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            self.partner: Node | None = None
+        
+        def __del__(self) -> None:
+            print(f"    {self.name} 해제됨")
     
-    def __del__(self) -> None:
-        print(f"  Node({self.name}) deleted")
-
-
-def circular_reference_problem() -> None:
-    """순환 참조가 메모리에 남는 문제."""
-    print("\n" + "=" * 60)
-    print("⚠️ 순환 참조 문제")
-    print("=" * 60)
+    # 순환 참조 없이
+    print("\n  순환 참조 없는 경우:")
+    a = Node("A")
+    del a  # 즉시 해제
     
-    # GC 비활성화하여 문제 재현
-    gc.disable()
+    # 순환 참조 발생
+    print("\n  순환 참조 발생:")
+    x = Node("X")
+    y = Node("Y")
+    x.partner = y  # X → Y
+    y.partner = x  # Y → X (순환!)
     
-    print("\n1. 순환 참조 생성:")
-    node_a = Node("A")
-    node_b = Node("B")
+    print("    del x, y 실행...")
+    del x
+    del y
+    # __del__이 호출되지 않을 수 있음!
     
-    # 순환 참조!
-    node_a.neighbor = node_b
-    node_b.neighbor = node_a
-    
-    print(f"   A -> B: {node_a.neighbor.name}")
-    print(f"   B -> A: {node_b.neighbor.name}")
-    
-    print("\n2. 변수 삭제:")
-    del node_a
-    del node_b
-    print("   del node_a, del node_b 실행됨")
-    print("   하지만 __del__은 호출되지 않음! (순환 참조)")
-    
-    print("\n3. 순환 GC 실행:")
-    collected = gc.collect()
-    print(f"   수집된 객체 수: {collected}")
-    
-    gc.enable()
-    
-    print("""
-    💡 순환 참조 시나리오:
-    
-    node_a ──► Node("A") ──┐
-                          │
-                          ▼
-    node_b ──► Node("B") ◄┘
-         └────────────────┘
-    
-    del node_a, del node_b 후에도:
-    - Node("A")의 참조 카운트: 1 (Node("B")가 참조)
-    - Node("B")의 참조 카운트: 1 (Node("A")가 참조)
-    
-    참조 카운트가 0이 아니므로 즉시 해제되지 않음!
-    순환 GC가 실행되어야 수집됨.
-    """)
+    print("    gc.collect() 실행...")
+    gc.collect()  # 순환 GC 강제 실행
 
 
 # =============================================================================
-# 3️⃣ ✅ weakref로 해결
+# 3️⃣ 실제 예시: 부모-자식 관계
 # =============================================================================
 
-class NodeWithWeakRef:
-    """weakref로 순환 참조 방지."""
+def parent_child_demo() -> None:
+    """
+    부모-자식 관계에서의 순환 참조.
+    """
+    print("부모-자식 순환 참조:")
     
-    def __init__(self, name: str) -> None:
-        self.name = name
-        self._neighbor: weakref.ref["NodeWithWeakRef"] | None = None
+    # ❌ 순환 참조 발생
+    class Parent:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            self.children: list[Child] = []
+        
+        def add_child(self, child: "Child") -> None:
+            self.children.append(child)
+            child.parent = self  # 순환!
     
-    @property
-    def neighbor(self) -> "NodeWithWeakRef | None":
-        if self._neighbor is None:
+    class Child:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            self.parent: Parent | None = None
+    
+    parent = Parent("Parent")
+    child1 = Child("Child1")
+    child2 = Child("Child2")
+    
+    parent.add_child(child1)
+    parent.add_child(child2)
+    
+    print(f"  parent.children: {[c.name for c in parent.children]}")
+    print(f"  child1.parent: {child1.parent.name if child1.parent else None}")
+    
+    # 순환: parent → children → child → parent
+    print("  ⚠️ 순환 참조 발생: parent → children → child → parent")
+
+
+# =============================================================================
+# 4️⃣ ✅ weakref로 해결
+# =============================================================================
+
+def weakref_solution_demo() -> None:
+    """
+    weakref를 사용하여 순환 참조 방지.
+    """
+    print("weakref로 순환 참조 방지:")
+    
+    class Parent:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            self.children: list["Child"] = []
+        
+        def add_child(self, child: "Child") -> None:
+            self.children.append(child)
+            child.parent = weakref.ref(self)  # 약한 참조!
+        
+        def __del__(self) -> None:
+            print(f"    Parent '{self.name}' 해제됨")
+    
+    class Child:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            self.parent: weakref.ref[Parent] | None = None
+        
+        def get_parent(self) -> Parent | None:
+            if self.parent:
+                return self.parent()  # weakref 역참조
             return None
-        return self._neighbor()  # weakref 호출
+        
+        def __del__(self) -> None:
+            print(f"    Child '{self.name}' 해제됨")
     
-    @neighbor.setter
-    def neighbor(self, node: "NodeWithWeakRef | None") -> None:
-        if node is None:
-            self._neighbor = None
-        else:
-            self._neighbor = weakref.ref(node)
+    print("\n  객체 생성:")
+    parent = Parent("Parent")
+    child = Child("Child")
+    parent.add_child(child)
     
-    def __del__(self) -> None:
-        print(f"  NodeWithWeakRef({self.name}) deleted")
-
-
-def weakref_solution() -> None:
-    """weakref로 순환 참조 방지."""
-    print("\n" + "=" * 60)
-    print("✅ weakref로 해결")
-    print("=" * 60)
+    print(f"  child.get_parent(): {child.get_parent()}")
     
-    gc.disable()
+    print("\n  del parent 실행:")
+    del parent
     
-    print("\n1. weakref로 연결:")
-    node_a = NodeWithWeakRef("A")
-    node_b = NodeWithWeakRef("B")
+    # 부모가 해제된 후 자식에서 접근
+    print(f"  child.get_parent() (부모 해제 후): {child.get_parent()}")
     
-    node_a.neighbor = node_b  # 약한 참조
-    node_b.neighbor = node_a  # 약한 참조
-    
-    print(f"   A -> B: {node_a.neighbor.name if node_a.neighbor else None}")
-    print(f"   B -> A: {node_b.neighbor.name if node_b.neighbor else None}")
-    
-    print("\n2. 변수 삭제:")
-    del node_b
-    print("   del node_b")
-    
-    # node_a.neighbor는 이제 None (약한 참조가 해제됨)
-    print(f"   node_a.neighbor: {node_a.neighbor}")
-    
-    del node_a
-    print("   del node_a")
-    
-    gc.enable()
-    
-    print("""
-    💡 weakref 동작:
-    
-    - weakref.ref(obj)는 obj에 대한 "약한 참조" 생성
-    - 약한 참조는 참조 카운트를 증가시키지 않음
-    - obj가 해제되면 weakref()는 None 반환
-    
-    사용처:
-    - 캐시 (메모리 부족 시 자동 해제)
-    - 옵저버 패턴 (리스너 목록)
-    - 부모-자식 관계 (자식이 부모를 약한 참조)
-    """)
+    print("\n  del child 실행:")
+    del child
 
 
 # =============================================================================
-# 4️⃣ 실무 패턴: 캐시
+# 5️⃣ weakref 패턴
 # =============================================================================
 
-def cache_with_weakref() -> None:
-    """weakref를 사용한 캐시 패턴."""
-    print("\n" + "=" * 60)
-    print("💡 실무 패턴: WeakValueDictionary 캐시")
-    print("=" * 60)
+def weakref_patterns_demo() -> None:
+    """
+    weakref 활용 패턴.
+    """
+    print("weakref 패턴:")
+    
+    # 1. 캐시 (WeakValueDictionary)
+    print("\n  1. 캐시 (WeakValueDictionary):")
     
     class ExpensiveObject:
         def __init__(self, id: int) -> None:
             self.id = id
-            print(f"  Created ExpensiveObject({id})")
+            print(f"    ExpensiveObject({id}) 생성")
         
         def __del__(self) -> None:
-            print(f"  Deleted ExpensiveObject({self.id})")
+            print(f"    ExpensiveObject({self.id}) 해제")
     
-    # 약한 참조 딕셔너리: 값이 다른 곳에서 참조되지 않으면 자동 삭제
     cache: weakref.WeakValueDictionary[int, ExpensiveObject] = weakref.WeakValueDictionary()
     
-    print("\n1. 객체 생성 및 캐시에 저장:")
+    # 캐시에 저장
     obj1 = ExpensiveObject(1)
-    obj2 = ExpensiveObject(2)
-    
     cache[1] = obj1
-    cache[2] = obj2
+    print(f"    cache[1]: {cache.get(1)}")
     
-    print(f"   캐시 키: {list(cache.keys())}")
-    
-    print("\n2. obj1 삭제:")
+    # obj1 참조 해제
     del obj1
+    gc.collect()
+    print(f"    del obj1 후 cache[1]: {cache.get(1)}")  # None
     
-    print(f"   캐시 키: {list(cache.keys())}")  # obj1이 자동으로 제거됨
+    # 2. 콜백 (weakref.finalize)
+    print("\n  2. 정리 콜백 (weakref.finalize):")
     
-    print("\n3. 캐시에서 조회:")
-    print(f"   cache.get(1): {cache.get(1)}")  # None
-    print(f"   cache.get(2): {cache.get(2)}")  # ExpensiveObject
+    class Resource:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            # __del__ 대신 finalize 사용
+            self._finalizer = weakref.finalize(
+                self, 
+                lambda n: print(f"    Resource '{n}' 정리됨"),
+                name
+            )
     
-    del obj2
+    res = Resource("MyResource")
+    del res
+    gc.collect()
 
 
 # =============================================================================
-# 5️⃣ GC 모니터링
+# 6️⃣ gc 모듈 활용
 # =============================================================================
 
-def gc_monitoring() -> None:
-    """GC 동작 모니터링."""
-    print("\n" + "=" * 60)
-    print("🔍 GC 모니터링")
-    print("=" * 60)
+def gc_module_demo() -> None:
+    """
+    gc 모듈로 순환 참조 탐지.
+    """
+    print("gc 모듈 활용:")
     
-    # GC 통계
-    print("\n1. GC 통계:")
-    print(f"   gc.get_count(): {gc.get_count()}")
-    print("   (gen0, gen1, gen2) - 각 세대의 할당 횟수")
+    # 순환 참조 생성
+    class Node:
+        def __init__(self) -> None:
+            self.ref: Node | None = None
     
-    # GC 임계값
-    print(f"\n2. GC 임계값:")
-    print(f"   gc.get_threshold(): {gc.get_threshold()}")
-    print("   (threshold0, threshold1, threshold2)")
+    # 순환 참조 생성
+    gc.collect()  # 기존 가비지 정리
+    gc.set_debug(0)  # 디버그 출력 비활성화
     
-    # GC 수동 실행
-    print(f"\n3. GC 수동 실행:")
-    collected = gc.collect()
-    print(f"   gc.collect() -> {collected} 객체 수집")
+    nodes = []
+    for i in range(5):
+        n1 = Node()
+        n2 = Node()
+        n1.ref = n2
+        n2.ref = n1
+        nodes.append((n1, n2))
     
-    # 수집 불가능한 객체 (Python 3.4 이전에서만)
-    print(f"\n4. 수집 불가능한 객체:")
-    print(f"   gc.garbage: {gc.garbage}")
+    # 참조 해제
+    del nodes
     
+    # 순환 참조 수집 전
+    unreachable_before = gc.collect()
+    print(f"  수집된 순환 참조 객체 수: {unreachable_before}")
+    
+    # gc 통계
+    print(f"\n  gc.get_stats():")
+    for i, stat in enumerate(gc.get_stats()):
+        print(f"    Generation {i}: collections={stat['collections']}, collected={stat['collected']}")
+
+
+# =============================================================================
+# 7️⃣ 요약
+# =============================================================================
+
+def summary() -> None:
+    """
+    순환 참조 요약.
+    """
     print("""
-    💡 GC 세대(Generation):
-    
-    - Gen 0: 새로 생성된 객체 (자주 검사)
-    - Gen 1: Gen 0에서 살아남은 객체
-    - Gen 2: Gen 1에서 살아남은 객체 (드물게 검사)
-    
-    객체가 오래 살아남을수록 높은 세대로 승격
-    → "오래된 객체는 더 오래 살 가능성 높음" 가정
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                  🟡 순환 참조 관리 규칙                        ║
+    ╠═══════════════════════════════════════════════════════════════╣
+    ║                                                               ║
+    ║  Python 메모리 관리:                                          ║
+    ║    1. 참조 카운팅 - 즉시 해제                                 ║
+    ║    2. 순환 GC - 주기적으로 순환 참조 수집                     ║
+    ║                                                               ║
+    ║  순환 참조가 문제되는 경우:                                   ║
+    ║    - __del__ 메서드가 있을 때                                 ║
+    ║    - 파일 핸들, 네트워크 연결 등 리소스 보유                  ║
+    ║    - 대용량 데이터를 참조할 때                                ║
+    ║                                                               ║
+    ║  ✅ 해결책:                                                    ║
+    ║                                                               ║
+    ║    1. weakref 사용                                            ║
+    ║       parent = weakref.ref(obj)                               ║
+    ║                                                               ║
+    ║    2. 명시적 정리 메서드                                      ║
+    ║       def close(self):                                        ║
+    ║           self.parent = None                                  ║
+    ║                                                               ║
+    ║    3. Context Manager 사용                                    ║
+    ║       with Resource() as r:                                   ║
+    ║           ...                                                 ║
+    ║                                                               ║
+    ║    4. weakref.finalize 사용 (__del__ 대신)                    ║
+    ║                                                               ║
+    ║  💡 권장 사항:                                                 ║
+    ║    - __del__ 사용 최소화                                      ║
+    ║    - 양방향 참조 시 한쪽은 weakref                            ║
+    ║    - 리소스는 Context Manager로 관리                          ║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝
     """)
 
 
@@ -296,45 +336,27 @@ def gc_monitoring() -> None:
 
 def main() -> None:
     """예제 실행."""
-    reference_counting_basics()
-    circular_reference_problem()
-    weakref_solution()
-    cache_with_weakref()
-    gc_monitoring()
+    demos = [
+        ("1️⃣ 참조 카운팅", reference_counting_demo),
+        ("2️⃣ 순환 참조", circular_reference_demo),
+        ("3️⃣ 부모-자식 관계", parent_child_demo),
+        ("4️⃣ weakref 해결책", weakref_solution_demo),
+        ("5️⃣ weakref 패턴", weakref_patterns_demo),
+        ("6️⃣ gc 모듈", gc_module_demo),
+        ("7️⃣ 요약", summary),
+    ]
     
-    print("\n" + "=" * 60)
-    print("💡 핵심 정리")
     print("=" * 60)
-    print("""
-    📌 Python 메모리 관리:
+    print("🟡 순환 참조와 메모리")
+    print("=" * 60)
+    print()
     
-    1. 참조 카운팅
-       - 참조 수가 0이 되면 즉시 해제
-       - 순환 참조는 처리 못함
-    
-    2. 순환 GC
-       - 순환 참조를 찾아서 해제
-       - 세대별 GC로 효율화
-    
-    ✅ 순환 참조 방지:
-    
-    1. weakref 사용
-       - weakref.ref(obj)
-       - WeakValueDictionary
-       - WeakSet
-    
-    2. 명시적 해제
-       - 불필요한 참조 None으로 설정
-       - del 사용
-    
-    3. 컨텍스트 매니저
-       - with문으로 리소스 자동 해제
-    
-    🔍 디버깅:
-       - gc.collect(): 수동 GC 실행
-       - gc.get_count(): 세대별 할당 수
-       - objgraph: 객체 참조 그래프 시각화
-    """)
+    for title, demo_func in demos:
+        print("-" * 60)
+        print(f"📌 {title}")
+        print("-" * 60)
+        demo_func()
+        print()
 
 
 if __name__ == "__main__":

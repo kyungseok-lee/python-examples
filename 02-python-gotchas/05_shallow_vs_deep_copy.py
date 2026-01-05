@@ -1,20 +1,20 @@
-#!/usr/bin/env python3
 """
-05_shallow_vs_deep_copy.py - 얕은 복사 vs 깊은 복사 (🟡 주의)
+05_shallow_vs_deep_copy.py - 🟠 얕은 복사 vs 깊은 복사
 
 📌 핵심 개념:
-   Python에서 객체를 복사할 때 "얕은 복사"가 기본입니다.
-   중첩된 객체(리스트 안의 리스트)는 참조가 복사되어 원본과 공유됩니다.
+    - 얕은 복사 (Shallow Copy): 최상위 객체만 복사, 내부 객체는 참조 공유
+    - 깊은 복사 (Deep Copy): 모든 중첩 객체까지 재귀적으로 복사
+    
+    Python의 list[:], copy.copy()는 얕은 복사입니다!
 
 🔄 다른 언어 비교:
-   - Java: clone()이 얕은 복사, 깊은 복사는 직접 구현 필요
-   - Go: 슬라이스 복사가 얕은 복사 (Python과 유사)
-   - Kotlin: copy()가 얕은 복사 (data class)
+    - Java: clone()은 얕은 복사, 깊은 복사는 직접 구현
+    - Go: 슬라이스 복사는 얕은 복사, copy() 내장 함수
+    - Kotlin: toMutableList()는 얕은 복사
+    - Python: copy, deepcopy 모듈 제공
 
 ⚠️ 주의사항:
-   - 리스트 슬라이싱 [:]은 얕은 복사
-   - list(), dict() 생성자도 얕은 복사
-   - 중첩 구조는 copy.deepcopy() 필요
+    중첩 리스트/딕셔너리를 복사할 때 특히 주의하세요!
 
 📚 참고: https://docs.python.org/3/library/copy.html
 """
@@ -22,250 +22,242 @@
 from __future__ import annotations
 
 import copy
+from typing import Any
 
 
 # =============================================================================
-# 1️⃣ 기본 개념: 할당 vs 복사
+# 1️⃣ 할당 vs 복사
 # =============================================================================
 
-def assignment_vs_copy() -> None:
-    """할당과 복사의 차이."""
-    print("=" * 60)
-    print("📌 할당 vs 복사")
-    print("=" * 60)
+def assignment_vs_copy_demo() -> None:
+    """
+    할당과 복사의 차이.
     
-    # 할당: 같은 객체를 참조
+    💡 Java 개발자를 위한 팁:
+        Java에서 참조 타입 할당은 참조 복사와 같습니다.
+        Python도 마찬가지입니다.
+    """
+    # 할당 = 같은 객체 참조
     original = [1, 2, 3]
-    assigned = original  # 같은 객체!
+    assigned = original
     
-    print(f"original = {original}, id = {id(original)}")
-    print(f"assigned = original, id = {id(assigned)}")
-    print(f"같은 객체? {original is assigned}")  # True
+    print("할당 (Assignment):")
+    print(f"  original = {original}")
+    print(f"  assigned = original")
+    print(f"  original is assigned: {original is assigned}")  # True
     
     assigned.append(4)
-    print(f"\nassigned.append(4) 후:")
-    print(f"original = {original}")  # [1, 2, 3, 4] - 원본도 변경!
-    print(f"assigned = {assigned}")
+    print(f"\n  assigned.append(4) 후:")
+    print(f"  original = {original}")  # [1, 2, 3, 4]
+    print(f"  assigned = {assigned}")  # [1, 2, 3, 4]
     
-    # 복사: 새 객체 생성
-    original2 = [1, 2, 3]
-    copied = original2.copy()  # 또는 list(original2) 또는 original2[:]
+    # 얕은 복사 = 새 객체, 하지만 내부는 참조
+    original = [1, 2, 3]
+    copied = original.copy()  # 또는 original[:] 또는 list(original)
     
-    print(f"\n원본: {original2}, id = {id(original2)}")
-    print(f"복사본: {copied}, id = {id(copied)}")
-    print(f"같은 객체? {original2 is copied}")  # False
+    print("\n얕은 복사 (Shallow Copy):")
+    print(f"  original = {original}")
+    print(f"  copied = original.copy()")
+    print(f"  original is copied: {original is copied}")  # False
     
     copied.append(4)
-    print(f"\ncopied.append(4) 후:")
-    print(f"original2 = {original2}")  # [1, 2, 3] - 원본 유지!
-    print(f"copied = {copied}")  # [1, 2, 3, 4]
+    print(f"\n  copied.append(4) 후:")
+    print(f"  original = {original}")  # [1, 2, 3]
+    print(f"  copied = {copied}")  # [1, 2, 3, 4]
 
 
 # =============================================================================
 # 2️⃣ ⚠️ 얕은 복사의 함정
 # =============================================================================
 
-def shallow_copy_gotcha() -> None:
-    """얕은 복사의 함정: 중첩 객체."""
-    print("\n" + "=" * 60)
-    print("⚠️ 얕은 복사의 함정: 중첩 객체")
-    print("=" * 60)
-    
+def shallow_copy_gotcha_demo() -> None:
+    """
+    얕은 복사의 함정 - 중첩 객체.
+    """
     # 중첩 리스트
-    matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    original = [[1, 2], [3, 4], [5, 6]]
+    shallow = original.copy()  # 얕은 복사
     
-    # 얕은 복사 방법들 (모두 동일한 결과)
-    shallow1 = matrix.copy()
-    shallow2 = list(matrix)
-    shallow3 = matrix[:]
-    
-    print(f"original: {matrix}")
-    print(f"shallow copy: {shallow1}")
-    print(f"같은 외부 리스트? {matrix is shallow1}")  # False
-    print(f"같은 내부 리스트? {matrix[0] is shallow1[0]}")  # True!
+    print("⚠️ 중첩 리스트의 얕은 복사:")
+    print(f"  original = {original}")
+    print(f"  shallow = original.copy()")
+    print(f"  original is shallow: {original is shallow}")  # False
+    print(f"  original[0] is shallow[0]: {original[0] is shallow[0]}")  # True!
     
     # 내부 리스트 수정
-    shallow1[0][0] = 999
-    
-    print(f"\nshallow1[0][0] = 999 후:")
-    print(f"original: {matrix}")   # [[999, 2, 3], ...] - 원본도 변경!
-    print(f"shallow: {shallow1}")
+    shallow[0].append(999)
+    print(f"\n  shallow[0].append(999) 후:")
+    print(f"  original = {original}")  # [[1, 2, 999], ...]!
+    print(f"  shallow = {shallow}")
     
     print("""
-    💡 얕은 복사의 동작:
-    
-    original  ──►  [ ●, ●, ● ]
-                    │  │  │
-                    ▼  ▼  ▼
-                 [1,2,3] [4,5,6] [7,8,9]
-                    ▲  ▲  ▲
-                    │  │  │
-    shallow   ──►  [ ●, ●, ● ]
-    
-    외부 리스트는 새로 생성되지만,
-    내부 리스트들은 참조가 복사됨!
+    ⚠️ 왜 이런 일이?
+    - 얕은 복사는 최상위 리스트만 새로 생성
+    - 내부 리스트 [1, 2]는 여전히 같은 객체를 참조
     """)
 
 
 # =============================================================================
-# 3️⃣ ✅ 깊은 복사로 해결
+# 3️⃣ ✅ 깊은 복사
 # =============================================================================
 
-def deep_copy_solution() -> None:
-    """깊은 복사로 완전한 복사."""
-    print("\n" + "=" * 60)
-    print("✅ 깊은 복사: copy.deepcopy()")
-    print("=" * 60)
+def deep_copy_demo() -> None:
+    """
+    깊은 복사로 문제 해결.
+    """
+    original = [[1, 2], [3, 4], [5, 6]]
+    deep = copy.deepcopy(original)  # 깊은 복사
     
-    matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    deep = copy.deepcopy(matrix)
-    
-    print(f"original: {matrix}")
-    print(f"deep copy: {deep}")
-    print(f"같은 외부 리스트? {matrix is deep}")  # False
-    print(f"같은 내부 리스트? {matrix[0] is deep[0]}")  # False!
+    print("✅ 깊은 복사:")
+    print(f"  original = {original}")
+    print(f"  deep = copy.deepcopy(original)")
+    print(f"  original is deep: {original is deep}")  # False
+    print(f"  original[0] is deep[0]: {original[0] is deep[0]}")  # False!
     
     # 내부 리스트 수정
-    deep[0][0] = 999
-    
-    print(f"\ndeep[0][0] = 999 후:")
-    print(f"original: {matrix}")  # [[1, 2, 3], ...] - 원본 유지!
-    print(f"deep: {deep}")
-    
-    print("""
-    💡 깊은 복사의 동작:
-    
-    original  ──►  [ ●, ●, ● ]
-                    │  │  │
-                    ▼  ▼  ▼
-                 [1,2,3] [4,5,6] [7,8,9]
-    
-    deep      ──►  [ ●, ●, ● ]
-                    │  │  │
-                    ▼  ▼  ▼
-                 [1,2,3] [4,5,6] [7,8,9]  (새로 생성된 객체들)
-    
-    모든 중첩 객체가 재귀적으로 복사됨!
-    """)
+    deep[0].append(999)
+    print(f"\n  deep[0].append(999) 후:")
+    print(f"  original = {original}")  # [[1, 2], ...] - 변경 없음!
+    print(f"  deep = {deep}")  # [[1, 2, 999], ...]
 
 
 # =============================================================================
-# 4️⃣ 딕셔너리도 동일
+# 4️⃣ 딕셔너리 복사
 # =============================================================================
 
-def dict_copy() -> None:
-    """딕셔너리의 얕은/깊은 복사."""
-    print("\n" + "=" * 60)
-    print("📌 딕셔너리도 동일")
-    print("=" * 60)
-    
-    original = {
-        "name": "Alice",
-        "scores": [90, 85, 88],
-        "address": {"city": "Seoul", "zip": "12345"}
+def dict_copy_demo() -> None:
+    """
+    딕셔너리 복사도 같은 문제.
+    """
+    # 중첩 딕셔너리
+    original: dict[str, Any] = {
+        "user": {"name": "Kim", "age": 30},
+        "settings": {"theme": "dark"}
     }
     
     # 얕은 복사
-    shallow = original.copy()  # 또는 dict(original)
-    shallow["scores"].append(100)
-    shallow["address"]["city"] = "Busan"
+    shallow = original.copy()  # 또는 dict(original) 또는 {**original}
     
-    print("얕은 복사 후 내부 객체 수정:")
-    print(f"original['scores'] = {original['scores']}")  # [90, 85, 88, 100]
-    print(f"original['address'] = {original['address']}")  # {'city': 'Busan', ...}
+    print("딕셔너리 얕은 복사:")
+    shallow["user"]["age"] = 31
+    print(f"  shallow['user']['age'] = 31 후:")
+    print(f"  original['user']['age'] = {original['user']['age']}")  # 31!
     
     # 깊은 복사
-    original2 = {
-        "name": "Bob",
-        "scores": [70, 75, 80],
-        "address": {"city": "Seoul", "zip": "54321"}
-    }
+    original["user"]["age"] = 30  # 원복
+    deep = copy.deepcopy(original)
     
-    deep = copy.deepcopy(original2)
-    deep["scores"].append(100)
-    deep["address"]["city"] = "Incheon"
-    
-    print("\n깊은 복사 후 내부 객체 수정:")
-    print(f"original2['scores'] = {original2['scores']}")  # [70, 75, 80]
-    print(f"original2['address'] = {original2['address']}")  # {'city': 'Seoul', ...}
+    print("\n딕셔너리 깊은 복사:")
+    deep["user"]["age"] = 31
+    print(f"  deep['user']['age'] = 31 후:")
+    print(f"  original['user']['age'] = {original['user']['age']}")  # 30
 
 
 # =============================================================================
-# 5️⃣ 복사 방법 정리
+# 5️⃣ 다양한 복사 방법
 # =============================================================================
 
-def copy_methods_summary() -> None:
-    """복사 방법 정리."""
-    print("\n" + "=" * 60)
-    print("📌 복사 방법 정리")
-    print("=" * 60)
+def copy_methods_demo() -> None:
+    """
+    다양한 복사 방법 비교.
+    """
+    original = [1, 2, [3, 4]]
     
+    print("다양한 얕은 복사 방법:")
+    methods = [
+        ("list.copy()", original.copy()),
+        ("list[:]", original[:]),
+        ("list(original)", list(original)),
+        ("copy.copy()", copy.copy(original)),
+    ]
+    
+    for name, copied in methods:
+        print(f"  {name}: {copied}")
+        print(f"    is original: {copied is original}")
+        print(f"    [2] is original[2]: {copied[2] is original[2]}")
+    
+    print("\n깊은 복사:")
+    deep = copy.deepcopy(original)
+    print(f"  copy.deepcopy(): {deep}")
+    print(f"    is original: {deep is original}")
+    print(f"    [2] is original[2]: {deep[2] is original[2]}")
+
+
+# =============================================================================
+# 6️⃣ 커스텀 객체의 복사
+# =============================================================================
+
+def custom_object_copy_demo() -> None:
+    """
+    커스텀 객체의 복사.
+    """
+    class Node:
+        def __init__(self, value: int, children: list["Node"] | None = None) -> None:
+            self.value = value
+            self.children = children or []
+        
+        def __repr__(self) -> str:
+            return f"Node({self.value}, children={len(self.children)})"
+    
+    # 트리 구조
+    child1 = Node(2)
+    child2 = Node(3)
+    root = Node(1, [child1, child2])
+    
+    print("커스텀 객체 복사:")
+    print(f"  root = {root}")
+    
+    # 얕은 복사
+    shallow_root = copy.copy(root)
+    print(f"\n  얕은 복사 후:")
+    print(f"  shallow_root is root: {shallow_root is root}")
+    print(f"  shallow_root.children[0] is root.children[0]: "
+          f"{shallow_root.children[0] is root.children[0]}")
+    
+    # 깊은 복사
+    deep_root = copy.deepcopy(root)
+    print(f"\n  깊은 복사 후:")
+    print(f"  deep_root is root: {deep_root is root}")
+    print(f"  deep_root.children[0] is root.children[0]: "
+          f"{deep_root.children[0] is root.children[0]}")
+
+
+# =============================================================================
+# 7️⃣ 요약
+# =============================================================================
+
+def summary() -> None:
+    """
+    복사 방법 요약.
+    """
     print("""
-    1. 리스트 복사:
-       얕은 복사: list.copy(), list[:], list(list), copy.copy()
-       깊은 복사: copy.deepcopy()
-    
-    2. 딕셔너리 복사:
-       얕은 복사: dict.copy(), dict(dict), {**dict}, copy.copy()
-       깊은 복사: copy.deepcopy()
-    
-    3. 셋 복사:
-       얕은 복사: set.copy(), set(set), copy.copy()
-       깊은 복사: copy.deepcopy() (보통 불필요 - 셋은 불변 객체만 포함)
-    
-    4. 언제 깊은 복사가 필요한가?
-       - 중첩 구조 (리스트 안의 리스트, 딕셔너리 안의 리스트 등)
-       - 원본과 완전히 독립적인 복사본이 필요할 때
-       - 복잡한 객체 그래프를 복사할 때
-    
-    5. 깊은 복사의 비용:
-       - 시간: 모든 중첩 객체를 재귀적으로 복사
-       - 메모리: 모든 객체가 새로 생성됨
-       - 순환 참조: deepcopy가 알아서 처리
-    """)
-
-
-# =============================================================================
-# 6️⃣ 실무 팁: 불변 객체 선호
-# =============================================================================
-
-def immutable_preference() -> None:
-    """불변 객체를 사용하면 복사 문제 회피."""
-    print("\n" + "=" * 60)
-    print("💡 실무 팁: 불변 객체 선호")
-    print("=" * 60)
-    
-    from dataclasses import dataclass
-    
-    # 불변 데이터클래스
-    @dataclass(frozen=True)
-    class Point:
-        x: float
-        y: float
-    
-    @dataclass(frozen=True)
-    class Rectangle:
-        top_left: Point
-        bottom_right: Point
-    
-    # 불변 객체는 복사 걱정 없음
-    p1 = Point(0, 0)
-    p2 = Point(10, 10)
-    rect = Rectangle(p1, p2)
-    
-    # 새 객체 생성으로 "수정"
-    new_rect = Rectangle(Point(5, 5), rect.bottom_right)
-    
-    print(f"rect = {rect}")
-    print(f"new_rect = {new_rect}")
-    print(f"rect.top_left is new_rect.bottom_right? {rect.bottom_right is new_rect.bottom_right}")  # True, 안전함
-    
-    print("""
-    💡 불변 객체의 장점:
-    - 복사 없이 안전하게 공유 가능
-    - 스레드 안전
-    - 해시 가능 (딕셔너리 키, 셋 원소로 사용)
-    - 함수형 프로그래밍과 잘 어울림
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║              🟠 얕은 복사 vs 깊은 복사 정리                    ║
+    ╠═══════════════════════════════════════════════════════════════╣
+    ║                                                               ║
+    ║  할당 (Assignment):                                           ║
+    ║    b = a  → 같은 객체 참조                                    ║
+    ║                                                               ║
+    ║  얕은 복사 (Shallow Copy):                                    ║
+    ║    - list.copy(), list[:], dict.copy(), {**d}                ║
+    ║    - copy.copy(obj)                                           ║
+    ║    - 최상위만 복사, 내부 객체는 참조 공유                     ║
+    ║                                                               ║
+    ║  깊은 복사 (Deep Copy):                                       ║
+    ║    - copy.deepcopy(obj)                                       ║
+    ║    - 모든 중첩 객체까지 재귀적 복사                           ║
+    ║                                                               ║
+    ║  ⚠️ 주의:                                                      ║
+    ║    - 중첩 리스트/딕셔너리는 deepcopy 필요                     ║
+    ║    - deepcopy는 느리므로 필요할 때만 사용                     ║
+    ║    - 순환 참조가 있으면 deepcopy가 처리함                     ║
+    ║                                                               ║
+    ║  💡 선택 가이드:                                               ║
+    ║    - 단순 리스트 (중첩 없음): 얕은 복사 OK                    ║
+    ║    - 중첩 구조: deepcopy 사용                                 ║
+    ║    - 성능 중요: 필요한 부분만 직접 복사                       ║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝
     """)
 
 
@@ -275,37 +267,27 @@ def immutable_preference() -> None:
 
 def main() -> None:
     """예제 실행."""
-    assignment_vs_copy()
-    shallow_copy_gotcha()
-    deep_copy_solution()
-    dict_copy()
-    copy_methods_summary()
-    immutable_preference()
+    demos = [
+        ("1️⃣ 할당 vs 복사", assignment_vs_copy_demo),
+        ("2️⃣ 얕은 복사 함정", shallow_copy_gotcha_demo),
+        ("3️⃣ 깊은 복사", deep_copy_demo),
+        ("4️⃣ 딕셔너리 복사", dict_copy_demo),
+        ("5️⃣ 복사 방법", copy_methods_demo),
+        ("6️⃣ 커스텀 객체", custom_object_copy_demo),
+        ("7️⃣ 요약", summary),
+    ]
     
-    print("\n" + "=" * 60)
-    print("💡 핵심 정리")
     print("=" * 60)
-    print("""
-    📌 기억할 것:
+    print("🟠 얕은 복사 vs 깊은 복사")
+    print("=" * 60)
+    print()
     
-    1. 할당 (=): 같은 객체 참조
-    2. 얕은 복사: 외부 객체만 새로 생성, 내부 객체는 공유
-    3. 깊은 복사: 모든 중첩 객체 재귀적으로 복사
-    
-    ✅ 권장 패턴:
-    
-    # 단순 리스트
-    new_list = original.copy()
-    
-    # 중첩 구조
-    import copy
-    new_nested = copy.deepcopy(original)
-    
-    # 최선: 불변 객체 사용
-    @dataclass(frozen=True)
-    class ImmutableData:
-        ...
-    """)
+    for title, demo_func in demos:
+        print("-" * 60)
+        print(f"📌 {title}")
+        print("-" * 60)
+        demo_func()
+        print()
 
 
 if __name__ == "__main__":

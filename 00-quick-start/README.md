@@ -1,73 +1,70 @@
-# 00. Quick Start - 10분 Python 핵심 투어
+# 00. Quick Start - 10분 안에 Python 핵심 파악
 
 > 💡 **Java/Go/Kotlin 개발자를 위한 핵심:**
-> Python은 동적 타이핑, 덕 타이핑, 간결한 문법이 특징입니다.
-> 이 섹션에서 10분 안에 Python의 핵심을 파악할 수 있습니다.
+> Python은 동적 타이핑 언어이지만, 타입 힌트로 정적 분석이 가능합니다.
+> 들여쓰기가 블록을 정의하며, 간결함을 추구합니다.
 
 ## 🎯 학습 목표
 
-1. Python 문법의 핵심 차이점 이해
-2. 다른 언어와의 빠른 비교
-3. Python만의 강력한 기능 체험
+1. Python 문법을 다른 언어와 비교하여 빠르게 이해
+2. Pythonic한 코드 스타일 감 잡기
+3. 핵심 기능 5가지 빠르게 훑기
 
-## 🔄 다른 언어와 빠른 비교
+## 🔄 다른 언어와 핵심 비교
 
 ### 변수 선언
 
 | Java | Go | Kotlin | Python |
 |------|-----|--------|--------|
-| `int x = 10;` | `var x int = 10` | `val x: Int = 10` | `x = 10` |
-| `String s = "hi";` | `s := "hi"` | `val s = "hi"` | `s = "hi"` |
-| 타입 필수 | 타입 추론 가능 | 타입 추론 가능 | **타입 선언 불필요** |
+| `String name = "Kim";` | `name := "Kim"` | `val name = "Kim"` | `name = "Kim"` |
+| `int age = 30;` | `var age int = 30` | `var age: Int = 30` | `age: int = 30` |
+| `final double PI = 3.14;` | `const PI = 3.14` | `const val PI = 3.14` | `PI: Final = 3.14` |
 
 ### 컬렉션
 
-| Java | Go | Python |
-|------|-----|--------|
-| `List<Integer> list = new ArrayList<>();` | `list := []int{}` | `list = []` |
-| `Map<String, Integer> map = new HashMap<>();` | `m := map[string]int{}` | `d = {}` |
-| `list.add(1);` | `list = append(list, 1)` | `list.append(1)` |
+| 개념 | Java | Go | Kotlin | Python |
+|------|------|-----|--------|--------|
+| 리스트 | `List.of(1, 2, 3)` | `[]int{1, 2, 3}` | `listOf(1, 2, 3)` | `[1, 2, 3]` |
+| 맵/딕셔너리 | `Map.of("a", 1)` | `map[string]int{"a": 1}` | `mapOf("a" to 1)` | `{"a": 1}` |
+| 집합 | `Set.of(1, 2)` | 없음 (map으로 구현) | `setOf(1, 2)` | `{1, 2}` |
 
-### Null/None 체크
+### 함수
 
 | Java | Go | Kotlin | Python |
 |------|-----|--------|--------|
-| `if (x != null)` | `if x != nil` | `x?.let {}` | `if x is not None:` |
-| `Optional<T>` | 에러 반환 | `T?` | `T \| None` |
-
-### 함수 정의
-
-| Java | Go | Python |
-|------|-----|--------|
-| `public int add(int a, int b) { return a + b; }` | `func add(a, b int) int { return a + b }` | `def add(a, b): return a + b` |
+| `int add(int a, int b)` | `func add(a, b int) int` | `fun add(a: Int, b: Int): Int` | `def add(a: int, b: int) -> int:` |
 
 ### 클래스
 
 | Java | Kotlin | Python |
 |------|--------|--------|
-| `public class User { ... }` | `data class User(...)` | `@dataclass class User:` |
-| getter/setter 필요 | 자동 생성 | `@property` 데코레이터 |
+| `class Person { }` | `class Person { }` | `class Person:` |
+| `public Person(String name)` | `class Person(val name: String)` | `def __init__(self, name: str):` |
+| `person.getName()` | `person.name` | `person.name` |
+
+### 에러 처리
+
+| Java | Go | Python |
+|------|-----|--------|
+| `try { } catch (Exception e) { }` | `if err != nil { }` | `try: ... except Exception as e:` |
+
+### Null 처리
+
+| Java | Kotlin | Python |
+|------|--------|--------|
+| `Optional<String>` | `String?` | `str \| None` 또는 `Optional[str]` |
+| `opt.orElse("default")` | `value ?: "default"` | `value or "default"` |
 
 ## 📚 예제 목록
 
-| 파일 | 설명 | 소요시간 |
-|------|------|----------|
-| `01_syntax_comparison.py` | Java/Go/Kotlin과 Python 문법 비교 | 5분 |
-| `02_quick_tour.py` | Python 핵심 기능 빠른 투어 | 5분 |
-
-## ⚠️ 처음부터 알아야 할 Python 특징
-
-1. **들여쓰기가 문법이다** - 중괄호 `{}` 대신 들여쓰기로 블록 구분
-2. **세미콜론 없음** - 줄바꿈이 문장 끝
-3. **동적 타이핑** - 변수 타입이 런타임에 결정
-4. **모든 것이 객체** - 함수도 객체 (일급 시민)
-5. **GIL 존재** - 멀티스레딩이 Java/Go와 다르게 동작
+| 파일 | 설명 | 난이도 | 소요시간 |
+|------|------|--------|----------|
+| [01_syntax_comparison.py](./01_syntax_comparison.py) | Java/Go 스타일 vs Python 스타일 | ⭐ | 5분 |
+| [02_quick_tour.py](./02_quick_tour.py) | Python 핵심 기능 투어 | ⭐ | 5분 |
 
 ## 🚀 실행 방법
 
 ```bash
-cd 00-quick-start
-
 # 문법 비교 예제
 python 01_syntax_comparison.py
 
@@ -75,9 +72,17 @@ python 01_syntax_comparison.py
 python 02_quick_tour.py
 ```
 
+## ⚠️ 첫날부터 알아야 할 것
+
+1. **들여쓰기가 문법이다** - 탭과 스페이스를 섞지 마세요 (4 스페이스 권장)
+2. **세미콜론 없음** - 한 줄에 여러 문장 쓸 때만 사용
+3. **`self`는 명시적** - Java의 `this`와 달리 메서드에 항상 첫 번째 인자로 명시
+4. **`None`은 `is`로 비교** - `if x is None:` (== 아님!)
+5. **인덱스는 0부터, 슬라이싱은 끝 미포함** - `list[0:2]`는 인덱스 0, 1만
+
 ## 📖 추가 학습 자료
 
 - [Python 공식 튜토리얼](https://docs.python.org/3/tutorial/)
-- [Python for Java Developers](https://realpython.com/java-vs-python/)
-- [Go vs Python](https://realpython.com/python-vs-go/)
+- [The Zen of Python](https://peps.python.org/pep-0020/) - `import this`
+- [PEP 8 스타일 가이드](https://pep8.org/)
 

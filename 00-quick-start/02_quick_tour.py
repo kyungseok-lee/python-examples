@@ -1,20 +1,22 @@
-#!/usr/bin/env python3
 """
 02_quick_tour.py - Python 핵심 기능 5분 투어
 
 📌 핵심 개념:
-   Python만의 강력한 기능들을 빠르게 체험
+    Python만의 강력한 기능들을 빠르게 훑어봅니다.
+    - List Comprehension
+    - Generator
+    - Context Manager (with문)
+    - Decorator
+    - f-string
 
-🔄 다른 언어에 없는 Python 특징:
-   - 리스트/딕셔너리 컴프리헨션
-   - 제너레이터와 yield
-   - 컨텍스트 매니저 (with)
-   - 데코레이터 (@)
-   - 언패킹 (*args, **kwargs)
+🔄 다른 언어 비교:
+    - Java: Stream API로 유사한 기능, 하지만 더 verbose
+    - Go: 대부분 for문으로 직접 구현 필요
+    - Kotlin: 컬렉션 연산자로 유사, 코루틴 지원
 
 ⚠️ 주의사항:
-   - 이 기능들은 Python에서 매우 자주 사용됨
-   - 다른 언어 습관으로 작성하면 "Pythonic하지 않다"는 리뷰를 받음
+    이 기능들은 Python을 "Pythonic"하게 만드는 핵심입니다.
+    다른 언어 스타일로 작성하면 동료 Python 개발자가 읽기 어려워합니다.
 
 📚 참고: https://docs.python.org/3/tutorial/
 """
@@ -22,348 +24,348 @@
 from __future__ import annotations
 
 import contextlib
-import functools
 import time
-from typing import Any, Callable, Generator
+from functools import wraps
+from typing import TYPE_CHECKING, Callable, Iterator
+
+if TYPE_CHECKING:
+    from typing import Any
 
 
 # =============================================================================
-# 1️⃣ 리스트 컴프리헨션 - Python의 가장 강력한 기능
+# 1️⃣ List/Dict/Set Comprehension - Python의 핵심 문법
 # =============================================================================
 
-def comprehensions_tour() -> None:
+def comprehension_tour() -> None:
     """
-    컴프리헨션 (Comprehension) - Python의 킬러 기능.
+    Comprehension - Python의 대표적인 간결한 문법.
     
     💡 Java 개발자를 위한 팁:
-        - Stream API의 map, filter를 한 줄로
-        - 훨씬 빠르고 가독성 좋음 (Python 관용구)
-    
-    💡 Go 개발자를 위한 팁:
-        - Go에서는 for loop 필수
-        - Python에서 for loop 쓰면 "Pythonic하지 않다"는 피드백 받음
+        Java Stream API와 유사하지만 훨씬 간결합니다.
+        
+        Java:
+            List<Integer> squares = IntStream.range(0, 10)
+                .map(x -> x * x)
+                .boxed()
+                .collect(Collectors.toList());
+                
+        Python:
+            squares = [x**2 for x in range(10)]
     """
-    print("\n📌 리스트 컴프리헨션")
-    print("-" * 50)
+    # List Comprehension
+    squares = [x**2 for x in range(10)]
+    print(f"제곱수: {squares}")
     
-    # 기본: [표현식 for 변수 in 이터러블]
-    numbers = [1, 2, 3, 4, 5]
+    # 조건부 필터링
+    even_squares = [x**2 for x in range(10) if x % 2 == 0]
+    print(f"짝수의 제곱: {even_squares}")
     
-    # Java: numbers.stream().map(x -> x * 2).collect(Collectors.toList())
-    # Go:   for _, n := range numbers { result = append(result, n*2) }
-    # Python:
-    doubled = [x * 2 for x in numbers]
-    print(f"Doubled: {doubled}")
+    # Dict Comprehension
+    word = "hello"
+    char_count = {char: word.count(char) for char in set(word)}
+    print(f"문자 빈도: {char_count}")
     
-    # 필터링: [표현식 for 변수 in 이터러블 if 조건]
-    # Java: numbers.stream().filter(x -> x % 2 == 0).collect(...)
-    evens = [x for x in numbers if x % 2 == 0]
-    print(f"Evens: {evens}")
+    # Set Comprehension
+    numbers = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+    unique_squares = {x**2 for x in numbers}
+    print(f"고유 제곱수: {unique_squares}")
     
-    # 조건 표현식 포함
-    labels = ["even" if x % 2 == 0 else "odd" for x in numbers]
-    print(f"Labels: {labels}")
-    
-    # 딕셔너리 컴프리헨션
-    squares = {x: x**2 for x in range(5)}
-    print(f"Squares dict: {squares}")
-    
-    # 셋 컴프리헨션
-    unique_mods = {x % 3 for x in range(10)}
-    print(f"Unique mods: {unique_mods}")
-    
-    # 중첩 컴프리헨션 (2D 리스트 평탄화)
+    # 중첩 Comprehension (2D → 1D 평탄화)
     matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     flattened = [num for row in matrix for num in row]
-    print(f"Flattened: {flattened}")
+    print(f"평탄화: {flattened}")
 
 
 # =============================================================================
-# 2️⃣ 제너레이터 - 메모리 효율적인 이터레이션
+# 2️⃣ Generator - 메모리 효율적인 반복
 # =============================================================================
 
-def generators_tour() -> None:
+def generator_tour() -> None:
     """
-    제너레이터 (Generator) - 지연 평가와 메모리 효율.
+    Generator - 지연 평가(Lazy Evaluation)로 메모리 절약.
     
     💡 Java 개발자를 위한 팁:
-        - Stream의 lazy evaluation과 유사
-        - 하지만 훨씬 더 직관적인 문법
-    
+        Java의 Stream과 유사한 개념입니다.
+        값을 한 번에 메모리에 올리지 않고 필요할 때 생성합니다.
+        
     💡 Go 개발자를 위한 팁:
-        - Go의 channel과 비슷한 개념
-        - yield가 데이터를 하나씩 반환
+        Go의 channel을 통한 값 전달과 개념적으로 유사합니다.
     """
-    print("\n📌 제너레이터")
-    print("-" * 50)
     
-    # 제너레이터 표현식 (리스트 컴프리헨션과 비슷하지만 () 사용)
-    # 리스트: 모든 값을 메모리에 저장
-    # 제너레이터: 필요할 때마다 값 생성
-    list_comp = [x**2 for x in range(1000)]
-    gen_exp = (x**2 for x in range(1000))
+    # Generator Expression (List Comprehension의 () 버전)
+    # 메모리: 값을 한 번에 생성하지 않음
+    gen = (x**2 for x in range(1000000))
+    print(f"Generator 타입: {type(gen)}")
+    print(f"처음 5개: {[next(gen) for _ in range(5)]}")
     
-    import sys
-    print(f"List size: {sys.getsizeof(list_comp):,} bytes")
-    print(f"Generator size: {sys.getsizeof(gen_exp):,} bytes")
+    # Generator Function (yield 사용)
+    def fibonacci(n: int) -> Iterator[int]:
+        """피보나치 수열 생성기."""
+        a, b = 0, 1
+        for _ in range(n):
+            yield a  # return 대신 yield - 함수 상태 유지
+            a, b = b, a + b
     
-    # 제너레이터 함수 (yield 사용)
-    def countdown(n: int) -> Generator[int, None, None]:
-        """yield로 값을 하나씩 반환."""
-        while n > 0:
-            yield n  # return과 달리 함수가 일시 정지
-            n -= 1
+    print(f"피보나치 10개: {list(fibonacci(10))}")
     
-    print("\nCountdown:")
-    for num in countdown(5):
-        print(f"  {num}", end=" ")
-    print()
-    
-    # 무한 시퀀스도 가능!
-    def infinite_counter() -> Generator[int, None, None]:
+    # 무한 Generator
+    def infinite_counter() -> Iterator[int]:
+        """무한 카운터 (주의: 반드시 제한 필요!)"""
         n = 0
         while True:
             yield n
             n += 1
     
-    print("\nInfinite counter (first 5):")
     counter = infinite_counter()
-    for _ in range(5):
-        print(f"  {next(counter)}", end=" ")
-    print()
+    first_five = [next(counter) for _ in range(5)]
+    print(f"무한 카운터 처음 5개: {first_five}")
 
 
 # =============================================================================
-# 3️⃣ 컨텍스트 매니저 - 리소스 자동 관리
+# 3️⃣ Context Manager (with문) - 리소스 관리
 # =============================================================================
 
-def context_managers_tour() -> None:
+def context_manager_tour() -> None:
     """
-    컨텍스트 매니저 (Context Manager) - with문으로 리소스 관리.
+    Context Manager - 리소스 자동 정리.
     
     💡 Java 개발자를 위한 팁:
-        - try-with-resources와 유사
-        - 하지만 더 유연하고 직접 만들기 쉬움
+        Java의 try-with-resources와 동일한 개념입니다.
+        
+        Java:
+            try (FileInputStream fis = new FileInputStream("file.txt")) {
+                // ...
+            }
+            
+        Python:
+            with open("file.txt") as f:
+                # ...
     
     💡 Go 개발자를 위한 팁:
-        - defer와 비슷하지만 더 구조적
-        - 에러 처리와 cleanup을 깔끔하게
+        Go의 defer와 유사하지만 더 구조화되어 있습니다.
     """
-    print("\n📌 컨텍스트 매니저 (with)")
-    print("-" * 50)
+    import tempfile
+    import os
     
-    # 파일 처리 - 자동으로 close() 호출
-    # Java: try (BufferedReader reader = new BufferedReader(...)) { ... }
-    # Go:   defer file.Close()
-    # Python:
-    print("File handling with 'with':")
+    # 기본 파일 처리
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+        f.write("Hello, Python!")
+        temp_path = f.name
+    # 블록을 벗어나면 자동으로 파일 핸들 닫힘
     
-    # 시뮬레이션 (실제 파일 없이)
-    class FakeFile:
-        def __init__(self, name: str) -> None:
-            self.name = name
-        def __enter__(self) -> "FakeFile":
-            print(f"  Opening {self.name}")
-            return self
-        def __exit__(self, *args: Any) -> None:
-            print(f"  Closing {self.name}")
-        def read(self) -> str:
-            return "file content"
-    
-    with FakeFile("data.txt") as f:
+    with open(temp_path) as f:
         content = f.read()
-        print(f"  Content: {content}")
-    print("  (파일이 자동으로 닫힘)")
+    print(f"파일 내용: {content}")
     
-    # contextlib으로 간단하게 만들기
+    os.unlink(temp_path)  # 임시 파일 삭제
+    
+    # 여러 리소스 동시 관리
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f1, \
+         tempfile.NamedTemporaryFile(mode='w', delete=False) as f2:
+        f1.write("File 1")
+        f2.write("File 2")
+        paths = (f1.name, f2.name)
+    
+    for path in paths:
+        os.unlink(path)
+    
+    # 커스텀 Context Manager (클래스)
+    class Timer:
+        """실행 시간 측정 Context Manager."""
+        
+        def __enter__(self) -> "Timer":
+            self.start = time.perf_counter()
+            return self
+        
+        def __exit__(self, *args: Any) -> None:
+            self.elapsed = time.perf_counter() - self.start
+            print(f"⏱️  실행 시간: {self.elapsed:.4f}초")
+    
+    with Timer():
+        # 시간이 걸리는 작업
+        total = sum(range(1000000))
+    
+    # 커스텀 Context Manager (데코레이터)
     @contextlib.contextmanager
-    def timer(label: str) -> Generator[None, None, None]:
-        """실행 시간 측정 컨텍스트 매니저."""
+    def timer_decorator() -> Iterator[None]:
+        """데코레이터로 만든 타이머."""
         start = time.perf_counter()
-        print(f"\n  [{label}] 시작")
         yield  # 여기서 with 블록 실행
-        end = time.perf_counter()
-        print(f"  [{label}] 완료: {end - start:.4f}초")
+        elapsed = time.perf_counter() - start
+        print(f"⏱️  실행 시간: {elapsed:.4f}초")
     
-    with timer("작업"):
-        # 실제 작업
-        total = sum(range(100000))
-        print(f"  계산 결과: {total}")
+    with timer_decorator():
+        total = sum(range(1000000))
 
 
 # =============================================================================
-# 4️⃣ 데코레이터 - 함수 확장의 강력한 도구
+# 4️⃣ Decorator - 함수/클래스 기능 확장
 # =============================================================================
 
-def decorators_tour() -> None:
+def decorator_tour() -> None:
     """
-    데코레이터 (Decorator) - 함수/클래스 확장.
+    Decorator - 함수나 클래스에 기능을 추가하는 패턴.
     
     💡 Java 개발자를 위한 팁:
-        - AOP (Aspect-Oriented Programming)와 유사
-        - 애노테이션(@)처럼 생겼지만 실제로 함수를 감싸는 것
-    
-    💡 Go 개발자를 위한 팁:
-        - Go에서는 미들웨어 패턴으로 구현
-        - Python은 언어 차원에서 지원
+        Java의 Annotation과 AOP를 합친 것과 유사합니다.
+        Spring의 @Transactional, @Cacheable 등과 비슷한 역할.
+        
+    💡 Kotlin 개발자를 위한 팁:
+        고차 함수를 활용한 함수 래핑과 개념적으로 동일합니다.
     """
-    print("\n📌 데코레이터")
-    print("-" * 50)
     
-    # 간단한 데코레이터
-    def log_calls(func: Callable[..., Any]) -> Callable[..., Any]:
-        """함수 호출을 로깅하는 데코레이터."""
-        @functools.wraps(func)  # 원본 함수 메타데이터 보존
+    # 기본 데코레이터
+    def log_call(func: Callable[..., Any]) -> Callable[..., Any]:
+        """함수 호출 로깅 데코레이터."""
+        @wraps(func)  # 원본 함수 메타데이터 보존
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            print(f"  ➡️ Calling {func.__name__}{args}")
+            print(f"📞 {func.__name__} 호출됨, args={args}, kwargs={kwargs}")
             result = func(*args, **kwargs)
-            print(f"  ⬅️ {func.__name__} returned {result}")
+            print(f"📤 {func.__name__} 반환: {result}")
             return result
         return wrapper
     
-    @log_calls
+    @log_call
     def add(a: int, b: int) -> int:
+        """두 수를 더합니다."""
         return a + b
     
-    result = add(10, 20)
+    result = add(3, 5)
     
-    # 인자가 있는 데코레이터
-    def repeat(times: int) -> Callable:
-        """함수를 여러 번 실행하는 데코레이터."""
+    # 인자를 받는 데코레이터
+    def retry(max_attempts: int = 3, delay: float = 0.1) -> Callable[..., Any]:
+        """실패 시 재시도 데코레이터."""
         def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-            @functools.wraps(func)
+            @wraps(func)
             def wrapper(*args: Any, **kwargs: Any) -> Any:
-                for _ in range(times):
-                    result = func(*args, **kwargs)
-                return result
+                last_exception = None
+                for attempt in range(1, max_attempts + 1):
+                    try:
+                        return func(*args, **kwargs)
+                    except Exception as e:
+                        last_exception = e
+                        print(f"⚠️  시도 {attempt}/{max_attempts} 실패: {e}")
+                        if attempt < max_attempts:
+                            time.sleep(delay)
+                raise last_exception  # type: ignore
             return wrapper
         return decorator
     
-    @repeat(times=3)
-    def say_hello() -> str:
-        print("  Hello!")
-        return "done"
+    @retry(max_attempts=3, delay=0.01)
+    def unstable_operation(fail_count: list[int]) -> str:
+        """처음 2번은 실패하는 함수."""
+        if fail_count[0] < 2:
+            fail_count[0] += 1
+            raise ValueError("일시적 오류!")
+        return "성공!"
     
-    print("\n@repeat(times=3):")
-    say_hello()
-    
-    # 실무에서 자주 사용: 캐싱
-    @functools.lru_cache(maxsize=128)
-    def fibonacci(n: int) -> int:
-        if n < 2:
-            return n
-        return fibonacci(n - 1) + fibonacci(n - 2)
-    
-    print(f"\nfibonacci(30) with cache: {fibonacci(30)}")
-    print(f"Cache info: {fibonacci.cache_info()}")
+    print("\n재시도 데코레이터 테스트:")
+    try:
+        result = unstable_operation([0])
+        print(f"최종 결과: {result}")
+    except ValueError as e:
+        print(f"최종 실패: {e}")
 
 
 # =============================================================================
-# 5️⃣ 언패킹 - 우아한 데이터 추출
+# 5️⃣ f-string과 문자열 처리
+# =============================================================================
+
+def string_tour() -> None:
+    """
+    f-string - Python 3.6+의 강력한 문자열 포맷팅.
+    
+    💡 Java 개발자를 위한 팁:
+        String.format()이나 MessageFormat보다 훨씬 간결합니다.
+        
+        Java: String.format("Hello, %s! You are %d years old.", name, age)
+        Python: f"Hello, {name}! You are {age} years old."
+        
+    💡 Kotlin 개발자를 위한 팁:
+        Kotlin의 String Template ($변수)과 유사하지만 더 강력합니다.
+    """
+    name = "Kim"
+    age = 30
+    salary = 50000.5
+    
+    # 기본 f-string
+    print(f"이름: {name}, 나이: {age}")
+    
+    # 표현식 사용
+    print(f"내년 나이: {age + 1}")
+    print(f"대문자 이름: {name.upper()}")
+    
+    # 포맷 지정
+    print(f"급여: {salary:,.2f}원")  # 천 단위 구분, 소수점 2자리
+    print(f"급여: {salary:>15,.2f}원")  # 우측 정렬, 15자리
+    
+    # 날짜/시간 포맷
+    from datetime import datetime
+    now = datetime.now()
+    print(f"현재 시간: {now:%Y-%m-%d %H:%M:%S}")
+    
+    # 디버깅용 (Python 3.8+)
+    x = 10
+    y = 20
+    print(f"{x=}, {y=}, {x+y=}")  # 변수명과 값 함께 출력
+    
+    # 멀티라인 f-string
+    user_info = f"""
+    =============================
+    사용자 정보
+    =============================
+    이름: {name}
+    나이: {age}
+    급여: {salary:,.2f}원
+    =============================
+    """
+    print(user_info)
+
+
+# =============================================================================
+# 6️⃣ 언패킹(Unpacking) - Python의 편의 기능
 # =============================================================================
 
 def unpacking_tour() -> None:
     """
-    언패킹 (Unpacking) - 데이터 추출의 예술.
+    Unpacking - 컬렉션의 값을 쉽게 분해.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - JavaScript의 destructuring과 유사
-        - Java/Go에는 이런 문법 없음 (부러워할 기능!)
+    💡 Java 개발자를 위한 팁:
+        Java에는 없는 기능입니다!
+        Java에서는 배열 인덱스로 직접 접근해야 합니다.
+        
+    💡 Kotlin 개발자를 위한 팁:
+        Kotlin의 destructuring declaration과 유사합니다.
     """
-    print("\n📌 언패킹")
-    print("-" * 50)
-    
-    # 튜플 언패킹
+    # 기본 언패킹
     point = (10, 20, 30)
     x, y, z = point
-    print(f"Tuple unpacking: x={x}, y={y}, z={z}")
+    print(f"x={x}, y={y}, z={z}")
     
-    # 스왑 (임시 변수 불필요!)
-    a, b = 1, 2
-    a, b = b, a  # Java/Go에서는 temp 변수 필요
-    print(f"Swap: a={a}, b={b}")
+    # * 연산자로 나머지 가져오기
+    first, *middle, last = [1, 2, 3, 4, 5]
+    print(f"first={first}, middle={middle}, last={last}")
     
-    # * 연산자로 나머지 캡처
-    first, *rest = [1, 2, 3, 4, 5]
-    print(f"First and rest: first={first}, rest={rest}")
-    
-    head, *middle, tail = [1, 2, 3, 4, 5]
-    print(f"Head, middle, tail: {head}, {middle}, {tail}")
-    
-    # 딕셔너리 언패킹 (**)
+    # 딕셔너리 언패킹
     defaults = {"host": "localhost", "port": 8080}
-    custom = {"port": 3000, "debug": True}
-    config = {**defaults, **custom}  # 병합 (뒤가 우선)
-    print(f"Merged config: {config}")
+    overrides = {"port": 3000, "debug": True}
+    config = {**defaults, **overrides}  # 병합
+    print(f"config: {config}")
     
     # 함수 인자 언패킹
-    def greet(name: str, greeting: str = "Hello") -> str:
-        return f"{greeting}, {name}!"
+    def greet(name: str, age: int, city: str) -> None:
+        print(f"{name}({age})님, {city}에서 안녕하세요!")
     
-    kwargs = {"name": "Alice", "greeting": "Hi"}
-    print(f"Function call with **: {greet(**kwargs)}")
+    user = {"name": "Kim", "age": 30, "city": "Seoul"}
+    greet(**user)  # dict를 키워드 인자로 전달
     
-    # *args, **kwargs
-    def flexible_func(*args: Any, **kwargs: Any) -> None:
-        print(f"  args: {args}")
-        print(f"  kwargs: {kwargs}")
+    args = ("Lee", 25, "Busan")
+    greet(*args)  # tuple을 위치 인자로 전달
     
-    print("\nflexible_func(1, 2, 3, x=10, y=20):")
-    flexible_func(1, 2, 3, x=10, y=20)
-
-
-# =============================================================================
-# 6️⃣ 덕 타이핑 - Python의 철학
-# =============================================================================
-
-def duck_typing_tour() -> None:
-    """
-    덕 타이핑 (Duck Typing) - "오리처럼 걷고 꽥꽥거리면 오리다".
-    
-    💡 Java/Kotlin 개발자를 위한 팁:
-        - 인터페이스 구현 선언 불필요
-        - 메서드만 있으면 동작
-    
-    💡 Go 개발자를 위한 팁:
-        - Go의 암묵적 인터페이스와 유사
-        - 하지만 런타임에 체크
-    """
-    print("\n📌 덕 타이핑")
-    print("-" * 50)
-    
-    # 인터페이스 선언 없이 동작
-    class Dog:
-        def speak(self) -> str:
-            return "Woof!"
-    
-    class Cat:
-        def speak(self) -> str:
-            return "Meow!"
-    
-    class Robot:
-        def speak(self) -> str:
-            return "Beep boop!"
-    
-    # 어떤 타입이든 speak() 메서드만 있으면 동작
-    def make_speak(animal: Any) -> None:
-        print(f"  {type(animal).__name__} says: {animal.speak()}")
-    
-    animals = [Dog(), Cat(), Robot()]
-    for animal in animals:
-        make_speak(animal)
-    
-    # Python 3.8+: Protocol로 타입 힌트와 덕 타이핑 결합
-    from typing import Protocol
-    
-    class Speakable(Protocol):
-        def speak(self) -> str: ...
-    
-    def make_speak_typed(animal: Speakable) -> None:
-        """타입 체커가 speak() 메서드 확인."""
-        print(f"  {animal.speak()}")
-    
-    print("\nWith Protocol (타입 힌트):")
-    make_speak_typed(Dog())  # 타입 체커 통과!
+    # 스왑
+    a, b = 1, 2
+    a, b = b, a
+    print(f"스왑 후: a={a}, b={b}")
 
 
 # =============================================================================
@@ -372,27 +374,21 @@ def duck_typing_tour() -> None:
 
 def main() -> None:
     """예제 실행."""
-    print("=" * 60)
-    print("🚀 Python 핵심 기능 5분 투어")
-    print("=" * 60)
+    tours = [
+        ("1️⃣ Comprehension", comprehension_tour),
+        ("2️⃣ Generator", generator_tour),
+        ("3️⃣ Context Manager", context_manager_tour),
+        ("4️⃣ Decorator", decorator_tour),
+        ("5️⃣ f-string", string_tour),
+        ("6️⃣ Unpacking", unpacking_tour),
+    ]
     
-    comprehensions_tour()
-    generators_tour()
-    context_managers_tour()
-    decorators_tour()
-    unpacking_tour()
-    duck_typing_tour()
-    
-    print("\n" + "=" * 60)
-    print("✅ Python 핵심 기능 투어 완료!")
-    print("=" * 60)
-    print("\n💡 핵심 정리:")
-    print("  1. 컴프리헨션으로 for loop 대체 (더 Pythonic)")
-    print("  2. 제너레이터로 메모리 효율적 처리")
-    print("  3. with문으로 리소스 자동 관리")
-    print("  4. 데코레이터로 함수 확장 (AOP)")
-    print("  5. 언패킹으로 우아한 데이터 처리")
-    print("  6. 덕 타이핑으로 유연한 다형성")
+    for title, tour_func in tours:
+        print("=" * 60)
+        print(f"📌 {title}")
+        print("=" * 60)
+        tour_func()
+        print()
 
 
 if __name__ == "__main__":

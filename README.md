@@ -1,224 +1,131 @@
-# Python Backend Expert Learning Path
+# 🐍 Python Examples for Experienced Developers
 
-> **대상:** Java/Go/Kotlin 등 다른 언어 경험이 있는 개발자가 Python을 빠르게 학습하기 위한 예제 중심 프로젝트입니다.
+> **Java/Go/Kotlin/TypeScript 개발자를 위한 Python 빠른 학습 가이드**
 
-Python 백엔드 전문가가 되기 위한 체계적인 학습 프로젝트입니다.
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🎯 학습 목표
+---
 
-- Python 문법과 관용구(Idioms)를 빠르게 익히기
-- 다른 언어와의 차이점 및 Python 특유의 함정(Gotchas) 이해
-- 실무에서 바로 적용 가능한 백엔드 패턴 습득
-- 메모리/GC 특성을 이해하고 성능 최적화 방법 학습
+## 🎯 이 프로젝트는 누구를 위한 것인가?
 
-## 🔧 기술 스택
+- ✅ Java, Go, Kotlin, TypeScript 중 **1개 이상의 언어를 이미 숙지**한 개발자
+- ✅ Python을 **빠르게** 학습하여 실무에 투입하고 싶은 개발자
+- ✅ 다른 언어 습관으로 인한 **Python 함정(Gotcha)** 을 피하고 싶은 개발자
+- ✅ **Pythonic**한 코드를 작성하고 싶은 개발자
 
-- **Python**: 3.12+ (LTS)
-- **Web Framework**: FastAPI 0.115+
-- **Data Validation**: Pydantic v2.10+
-- **Database**: SQLAlchemy 2.0+
-- **Testing**: pytest 8.3+
+---
 
-## 📚 커리큘럼 구성
-
-### 🚀 00. Quick Start (신규!)
-> **10분 안에 Python 핵심 파악** - 다른 언어 개발자를 위한 빠른 투어
-
-- **01_syntax_comparison**: Java/Go/Kotlin과 Python 문법 비교
-- **02_quick_tour**: Python 핵심 기능 빠른 투어 (컴프리헨션, 제너레이터, 데코레이터)
-
-### 01. 기본 문법 (Basics)
-Python의 기초를 탄탄히 다지는 단계입니다.
-
-- **01_variables_and_types**: 변수, 기본 자료형, 타입 변환
-- **02_operators**: 산술, 비교, 논리, 비트 연산자
-- **03_control_flow**: if/elif/else, match-case
-- **04_loops**: for, while, comprehensions
-- **05_functions**: 함수 정의, 인자, 반환값, lambda
-- **06_data_structures**: list, tuple, dict, set
-- **07_strings**: 문자열 조작, 포매팅, 정규표현식
-- **08_classes_basic**: 클래스, 인스턴스, 메서드, 상속
-
-### ⚠️ 02. Python Gotchas (신규!)
-> **다른 언어 개발자가 가장 많이 실수하는 패턴** - 필독!
-
-- **01_mutable_default_args**: 가변 기본 인자 함정 (🔴 치명적)
-- **02_class_vs_instance_vars**: 클래스 변수 vs 인스턴스 변수 (🔴 치명적)
-- **03_is_vs_equals**: is vs == 차이 (🟠 중요)
-- **04_late_binding_closures**: 클로저 Late Binding (🟠 중요)
-- **05_shallow_vs_deep_copy**: 얕은 복사 vs 깊은 복사 (🟡 주의)
-- **06_variable_scope_leaking**: 변수 스코프 누출 (🟡 주의)
-- **07_circular_reference**: 순환 참조와 메모리 (🟡 주의)
-
-### 02. 중급 개념 (Intermediate)
-실무에서 자주 사용하는 중급 기술을 학습합니다.
-
-- **01_decorators**: 함수/클래스 데코레이터, wraps
-- **02_generators**: yield, 제너레이터 표현식, 이터레이터
-- **03_context_managers**: with문, contextlib
-- **04_file_io**: 파일 읽기/쓰기, CSV, JSON
-- **05_error_handling**: try-except, 커스텀 예외
-- **06_modules_packages**: 모듈 구조, __init__.py, 패키지 관리
-- **07_collections**: namedtuple, Counter, defaultdict, deque
-- **08_datetime**: 날짜/시간 처리, timezone
-
-### 03. 고급 개념 (Advanced)
-Python의 심화 기능과 성능 최적화를 다룹니다.
-
-- **01_async_programming**: async/await, asyncio
-- **02_multithreading**: threading, concurrent.futures
-- **03_type_hints**: Python 3.12+ 타입 힌트, Protocol, Generic
-- **04_dataclasses**: @dataclass, slots, frozen
-- **05_testing**: pytest, fixtures, mocking
-
-### 04. 백엔드 전문가 (Backend Expert)
-실전 백엔드 개발에 필요한 핵심 기술을 마스터합니다.
-
-- **01_fastapi_basics**: FastAPI 기본, 라우팅, 요청/응답
-- **02_pydantic_models**: Pydantic v2, 데이터 검증, 시리얼라이제이션
-- **03_clean_architecture**: 계층 분리, 의존성 역전, Protocol
-
-### 📋 99. Cheatsheets (신규!)
-> 빠른 참조용 치트시트
-
-- **syntax_cheatsheet.md**: Python 문법 빠른 참조
-- **gotchas_cheatsheet.md**: 함정 패턴 빠른 참조
-- **performance_cheatsheet.md**: 성능 최적화 팁
-
-## 🚀 빠른 시작
-
-### 권장 학습 순서 (다른 언어 경험자)
-
-```
-00-quick-start (10분) → 02-python-gotchas (30분) → 나머지 순차 학습
-```
-
-### 1. Python 설치 확인
-```bash
-python --version  # 3.12 이상 권장
-```
-
-Python이 없다면? → **[상세 설치 가이드 보기](SETUP.md)**
-
-### 2. 프로젝트 시작
+## 🚀 빠른 시작 (10분)
 
 ```bash
-# 1) 프로젝트 클론
-git clone https://github.com/kyungseok-lee/python-examples.git
+# 1. 저장소 클론
+git clone https://github.com/your-username/python-examples.git
 cd python-examples
 
-# 2) 가상환경 설정 (권장)
-python -m venv venv
+# 2. 가상환경 생성 및 활성화
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-
-# 3) Quick Start 실행 (의존성 설치 불필요!)
+# 3. Quick Start 예제 실행
 cd 00-quick-start
 python 01_syntax_comparison.py
 python 02_quick_tour.py
 ```
 
-### 3. 함정(Gotchas) 학습 (중요!)
+---
+
+## 📚 학습 로드맵
+
+### Phase 1: 기초 (1-2시간)
+| 순서 | 섹션 | 설명 | 소요시간 |
+|------|------|------|----------|
+| 1 | [00-quick-start](./00-quick-start/) | Python 핵심 10분 파악 | 10분 |
+| 2 | [01-pythonic-basics](./01-pythonic-basics/) | Python다운 기초 문법 | 30분 |
+| 3 | [02-python-gotchas](./02-python-gotchas/) | ⚠️ **필독!** 실수하기 쉬운 패턴 | 30분 |
+
+### Phase 2: 심화 (2-3시간)
+| 순서 | 섹션 | 설명 | 소요시간 |
+|------|------|------|----------|
+| 4 | [03-memory-and-gc](./03-memory-and-gc/) | 메모리 관리 & GC | 30분 |
+| 5 | [04-concurrency](./04-concurrency/) | 동시성 (GIL, asyncio) | 45분 |
+| 6 | [05-type-hints](./05-type-hints/) | 타입 힌트 | 30분 |
+
+### Phase 3: 패턴 & 실무 (2-3시간)
+| 순서 | 섹션 | 설명 | 소요시간 |
+|------|------|------|----------|
+| 7 | [06-oop-patterns](./06-oop-patterns/) | OOP 패턴 | 30분 |
+| 8 | [07-functional](./07-functional/) | 함수형 프로그래밍 | 30분 |
+| 9 | [08-testing](./08-testing/) | pytest 테스팅 | 30분 |
+| 10 | [09-backend-patterns](./09-backend-patterns/) | 백엔드 실무 패턴 | 45분 |
+| 11 | [10-performance](./10-performance/) | 성능 최적화 | 30분 |
+
+### 빠른 참조
+- [99-cheatsheets](./99-cheatsheets/) - 문법, 함정, 성능 치트시트
+
+---
+
+## 🔄 다른 언어 vs Python 핵심 비교
+
+| 개념 | Java | Go | Kotlin | Python |
+|------|------|-----|--------|--------|
+| 변수 선언 | `int x = 1;` | `x := 1` | `val x = 1` | `x = 1` |
+| 타입 시스템 | 정적 | 정적 | 정적 | 동적 (힌트 가능) |
+| 컬렉션 | `ArrayList<String>` | `[]string{}` | `listOf()` | `list()` / `[]` |
+| 널 처리 | `Optional<T>` | 제로값 | `?.` / `?:` | `None` / `Optional` |
+| 동시성 | Thread, Executor | goroutine | coroutine | **GIL** / asyncio |
+| 패키지 관리 | Maven/Gradle | go mod | Gradle | pip / poetry |
+| 엔트리포인트 | `main()` | `main()` | `main()` | `if __name__ == "__main__":` |
+
+---
+
+## ⚠️ Java/Go/Kotlin 개발자가 가장 많이 하는 실수 TOP 7
+
+1. **가변 기본 인자** - `def func(items=[])` → 모든 호출이 같은 리스트 공유!
+2. **클래스 변수 공유** - 인스턴스 간 가변 클래스 변수 공유 문제
+3. **is vs ==** - 작은 정수 캐싱으로 인한 혼란
+4. **Late Binding Closures** - 루프 안 람다가 마지막 값만 참조
+5. **얕은 복사** - 리스트 슬라이싱은 얕은 복사!
+6. **변수 스코프 누출** - for문 변수가 바깥에서 접근 가능
+7. **GIL** - 멀티스레드가 CPU 바운드에서 느린 이유
+
+👉 자세한 내용: [02-python-gotchas](./02-python-gotchas/)
+
+---
+
+## 🛠️ 개발 환경 설정
+
+### 필수 요구사항
+- Python 3.12+
+- pip 또는 poetry
+
+### 권장 IDE 설정
 ```bash
-cd 02-python-gotchas
-python 01_mutable_default_args.py
-python 02_class_vs_instance_vars.py
-# ... 나머지도 실행
+# VS Code 확장
+code --install-extension ms-python.python
+code --install-extension ms-python.vscode-pylance
+
+# 린터/포매터 설치
+pip install ruff mypy
 ```
 
-### 4. FastAPI 서버 실행 (백엔드 과정)
+### 프로젝트 의존성
 ```bash
-cd 04-backend-expert
 pip install -r requirements.txt
-uvicorn 01_fastapi_basics:app --reload
-
-# 브라우저에서 열기: http://localhost:8000/docs
 ```
 
-## 📦 환경 설정
+---
 
-상세한 환경 설정은 **[SETUP.md](SETUP.md)** 파일을 참고하세요.
+## 📖 참고 자료
 
-## 🎯 Python 3.12+ 주요 특징
+- [Python 공식 문서](https://docs.python.org/3/)
+- [PEP 8 - 스타일 가이드](https://pep8.org/)
+- [Real Python](https://realpython.com/)
+- [Python Design Patterns](https://python-patterns.guide/)
 
-이 프로젝트는 Python 3.12+ 스타일을 적용합니다:
+---
 
-### 타입 힌트
-```python
-# Python 3.9+: 내장 타입 사용
-def process(items: list[int]) -> dict[str, int]:
-    ...
+## 📄 라이선스
 
-# Python 3.10+: 유니온 문법
-def find(id: int) -> User | None:
-    ...
+MIT License - 자유롭게 사용하세요!
 
-# Python 3.12+: type 키워드 (PEP 695)
-type Vector = list[float]
-```
-
-### 메모리 최적화 (GC 관점)
-```python
-from dataclasses import dataclass
-
-# __slots__ 사용으로 메모리 절약
-@dataclass(slots=True)
-class User:
-    id: int
-    name: str
-    email: str
-```
-
-### Pydantic v2
-```python
-from pydantic import BaseModel, ConfigDict, field_validator
-
-class User(BaseModel):
-    model_config = ConfigDict(str_strip_whitespace=True)
-    
-    name: str
-    email: str
-    
-    @field_validator('name')
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        if len(v) < 2:
-            raise ValueError('Name too short')
-        return v
-```
-
-## 🔬 GC/메모리 최적화 포인트
-
-1. **`__slots__` 사용**: 클래스에서 `__dict__` 대신 `__slots__` 사용
-2. **제너레이터 활용**: 대용량 데이터 처리 시 메모리 효율적
-3. **불변 객체 선호**: `frozen=True` 데이터클래스 사용
-4. **Protocol 사용**: ABC 대신 구조적 서브타이핑
-5. **gc 모듈 활용**: 성능 크리티컬 구간에서 GC 제어
-
-## 📖 추가 학습 자료
-
-- [Python 3.12 What's New](https://docs.python.org/3/whatsnew/3.12.html)
-- [Pydantic v2 Documentation](https://docs.pydantic.dev/latest/)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Python Memory Management](https://docs.python.org/3/c-api/memory.html)
-
-## 📋 프로젝트 개선 가이드
-
-이 프로젝트의 구조와 개선 방향에 대한 상세 가이드는 **[PROMPT_ENGINEERING.md](PROMPT_ENGINEERING.md)**를 참고하세요.
-
-- 전문가 대상 학습 콘텐츠 작성 가이드
-- 폴더 구조 제안
-- 예제 파일 템플릿
-- 다른 언어와의 비교 포인트
-
-## 🤝 기여
-
-이 프로젝트는 지속적으로 업데이트됩니다. 개선 사항이나 새로운 예제가 있다면 PR을 보내주세요!
-
-## 📝 라이선스
-
-MIT License

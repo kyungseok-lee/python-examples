@@ -1,155 +1,141 @@
-#!/usr/bin/env python3
 """
-01_syntax_comparison.py - Java/Go/Kotlin과 Python 문법 비교
+01_syntax_comparison.py - Java/Go 스타일 vs Python 스타일 비교
 
 📌 핵심 개념:
-   다른 언어 개발자가 Python으로 전환할 때 알아야 할 문법 차이점
+    다른 언어 개발자가 Python으로 전환할 때 문법적 차이를 빠르게 이해
 
 🔄 다른 언어 비교:
-   - Java: 정적 타이핑, 장황한 문법, 클래스 필수
-   - Go: 정적 타이핑, 간결한 문법, 에러 반환
-   - Kotlin: 정적 타이핑, 간결한 문법, null safety
-   - Python: 동적 타이핑, 매우 간결, 덕 타이핑
+    - Java: 명시적 타입, 세미콜론, 중괄호 블록
+    - Go: 짧은 변수 선언(:=), 명시적 에러 처리
+    - Kotlin: 간결한 문법, data class
+    - Python: 동적 타이핑, 들여쓰기 블록, 간결함
 
 ⚠️ 주의사항:
-   - Python은 들여쓰기가 문법! (4 spaces 권장)
-   - 세미콜론 없음
-   - 타입은 런타임에 결정됨
+    Python에서는 들여쓰기가 문법입니다. 탭과 스페이스를 섞지 마세요!
 
 📚 참고: https://docs.python.org/3/tutorial/
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Optional
+
 
 # =============================================================================
 # 1️⃣ 변수 선언 비교
 # =============================================================================
 
-def variable_declaration() -> None:
+def variable_declaration_demo() -> None:
     """
     변수 선언 방식 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - Java: int x = 10; String s = "hello";
-        - Go:   var x int = 10 또는 x := 10
-        - Kotlin: val x: Int = 10 또는 val x = 10
-        - Python: 그냥 x = 10 (타입 선언 불필요!)
+    💡 Java/Go 개발자를 위한 팁:
+        - Java: `int age = 30;` - 타입 먼저, 세미콜론 필수
+        - Go: `age := 30` 또는 `var age int = 30`
+        - Python: `age = 30` 또는 `age: int = 30` (타입 힌트)
+        
+        Python의 타입 힌트는 런타임에 강제되지 않습니다!
+        mypy 같은 도구로 정적 분석 시에만 검사됩니다.
     """
-    print("\n📌 변수 선언")
-    print("-" * 50)
+    # Python 스타일 - 타입 힌트 없이
+    name = "Kim"
+    age = 30
+    is_active = True
     
-    # Python: 타입 선언 없이 바로 할당
-    x = 10
-    name = "Python"
-    is_awesome = True
-    price = 19.99
+    # Python 스타일 - 타입 힌트 포함 (권장)
+    name_typed: str = "Kim"
+    age_typed: int = 30
+    is_active_typed: bool = True
     
-    print(f"x = {x} (type: {type(x).__name__})")
-    print(f"name = {name} (type: {type(name).__name__})")
-    print(f"is_awesome = {is_awesome} (type: {type(is_awesome).__name__})")
-    print(f"price = {price} (type: {type(price).__name__})")
+    # 여러 변수 동시 할당 (Python만의 기능)
+    x, y, z = 1, 2, 3
     
-    # 동적 타이핑: 같은 변수에 다른 타입 할당 가능 (권장하지 않음!)
-    x = "이제 문자열"  # Java에서는 컴파일 에러!
-    print(f"\nx = {x} (type changed to: {type(x).__name__})")
+    # 값 교환 (Java/Go에서는 임시 변수 필요)
+    a, b = 10, 20
+    a, b = b, a  # 파이썬은 이렇게 간단!
     
-    # 타입 힌트 (Python 3.5+): 타입 체커용, 런타임에는 영향 없음
-    count: int = 100
-    message: str = "Hello"
-    print(f"\n타입 힌트 사용: count={count}, message={message}")
+    print(f"name: {name_typed}, age: {age_typed}")
+    print(f"좌표: ({x}, {y}, {z})")
+    print(f"교환 후: a={a}, b={b}")
 
 
 # =============================================================================
 # 2️⃣ 컬렉션 비교
 # =============================================================================
 
-def collections_comparison() -> None:
+def collections_demo() -> None:
     """
-    컬렉션 타입 비교.
+    컬렉션 사용법 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - Java: ArrayList<Integer>, HashMap<String, Integer>
-        - Go:   []int, map[string]int
-        - Python: list, dict (타입 파라미터 불필요!)
+    💡 Java 개발자를 위한 팁:
+        - ArrayList → list
+        - HashMap → dict
+        - HashSet → set
+        
+        Python 컬렉션은 기본적으로 가변(mutable)입니다.
+        불변이 필요하면 tuple, frozenset을 사용하세요.
     """
-    print("\n📌 컬렉션")
-    print("-" * 50)
+    # List (Java의 ArrayList, Go의 slice)
+    numbers: list[int] = [1, 2, 3, 4, 5]
+    numbers.append(6)  # Java: list.add(6)
+    numbers.extend([7, 8])  # Java: list.addAll(Arrays.asList(7, 8))
     
-    # 리스트 (Java의 ArrayList, Go의 slice)
-    # Java: List<Integer> numbers = Arrays.asList(1, 2, 3);
-    # Go:   numbers := []int{1, 2, 3}
-    numbers = [1, 2, 3, 4, 5]
+    # Dict (Java의 HashMap, Go의 map)
+    person: dict[str, str | int] = {
+        "name": "Kim",
+        "age": 30,
+        "city": "Seoul"
+    }
+    person["email"] = "kim@example.com"  # Java: map.put("email", "...")
+    
+    # Set (Java의 HashSet)
+    unique_numbers: set[int] = {1, 2, 3, 3, 3}  # {1, 2, 3}
+    unique_numbers.add(4)
+    
+    # Tuple (불변 리스트) - Java에는 없음, Kotlin의 Pair/Triple 유사
+    point: tuple[int, int] = (10, 20)
+    # point[0] = 100  # 에러! tuple은 불변
+    
     print(f"List: {numbers}")
-    
-    # 딕셔너리 (Java의 HashMap, Go의 map)
-    # Java: Map<String, Integer> ages = new HashMap<>();
-    # Go:   ages := map[string]int{"Alice": 25}
-    ages = {"Alice": 25, "Bob": 30}
-    print(f"Dict: {ages}")
-    
-    # 튜플 (Java에 없음, Go에 없음 - struct 사용)
-    # 불변(immutable) 시퀀스
-    point = (10, 20)
+    print(f"Dict: {person}")
+    print(f"Set: {unique_numbers}")
     print(f"Tuple: {point}")
-    
-    # 셋 (Java의 HashSet, Go에 내장 없음)
-    unique = {1, 2, 3, 3, 3}  # 중복 제거
-    print(f"Set: {unique}")
-    
-    # 리스트 컴프리헨션 (Python의 강력한 기능!)
-    # Java: numbers.stream().map(x -> x * 2).collect(Collectors.toList())
-    # Go:   for loop 필요
-    doubled = [x * 2 for x in numbers]
-    print(f"\nList Comprehension: {doubled}")
-    
-    # 딕셔너리 컴프리헨션
-    squared = {x: x**2 for x in range(5)}
-    print(f"Dict Comprehension: {squared}")
 
 
 # =============================================================================
 # 3️⃣ 조건문 비교
 # =============================================================================
 
-def conditionals_comparison() -> None:
+def conditionals_demo() -> None:
     """
     조건문 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - 괄호 불필요
-        - 중괄호 대신 콜론(:)과 들여쓰기
-        - elif (else if 아님!)
-        - switch 대신 match (Python 3.10+)
+    💡 Java/Go 개발자를 위한 팁:
+        - 중괄호 {} 대신 콜론(:)과 들여쓰기 사용
+        - else if → elif
+        - switch문 없음 → match문 (Python 3.10+) 또는 dict 매핑
     """
-    print("\n📌 조건문")
-    print("-" * 50)
-    
     score = 85
     
-    # Java: if (score >= 90) { grade = "A"; }
-    # Go:   if score >= 90 { grade = "A" }
-    # Python: 괄호 없이, 콜론과 들여쓰기
+    # if-elif-else (Java의 if-else if-else)
     if score >= 90:
         grade = "A"
-    elif score >= 80:  # else if 아님!
+    elif score >= 80:
         grade = "B"
     elif score >= 70:
         grade = "C"
     else:
         grade = "F"
     
-    print(f"Score {score} -> Grade {grade}")
+    print(f"점수: {score}, 학점: {grade}")
     
-    # 삼항 연산자
-    # Java: String result = score >= 60 ? "Pass" : "Fail";
-    # Go:   없음 (if문 사용)
-    # Python:
-    result = "Pass" if score >= 60 else "Fail"
-    print(f"Result: {result}")
+    # 삼항 연산자 (Java: condition ? a : b)
+    status = "합격" if score >= 60 else "불합격"
+    print(f"상태: {status}")
     
-    # match 문 (Python 3.10+, Java의 switch와 유사하지만 더 강력)
-    http_status = 404
+    # match문 (Python 3.10+) - Java의 switch 유사
+    http_status = 200
     match http_status:
         case 200:
             message = "OK"
@@ -167,215 +153,190 @@ def conditionals_comparison() -> None:
 # 4️⃣ 반복문 비교
 # =============================================================================
 
-def loops_comparison() -> None:
+def loops_demo() -> None:
     """
     반복문 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - for (int i = 0; i < n; i++) 스타일 없음!
-        - for-each 스타일이 기본
-        - range() 함수로 인덱스 반복
-        - enumerate()로 인덱스와 값 동시에
+    💡 Java/Go 개발자를 위한 팁:
+        - for (int i = 0; i < n; i++) → for i in range(n)
+        - for-each → for item in collection
+        - while문은 동일
+        - do-while 없음!
     """
-    print("\n📌 반복문")
-    print("-" * 50)
+    # range를 이용한 반복 (Java의 전통적 for문)
+    print("range 반복:")
+    for i in range(5):  # 0, 1, 2, 3, 4
+        print(f"  i = {i}")
     
+    # 컬렉션 순회 (Java의 for-each)
     fruits = ["apple", "banana", "cherry"]
-    
-    # Java: for (String fruit : fruits) { ... }
-    # Go:   for _, fruit := range fruits { ... }
-    # Python:
-    print("For-each style:")
+    print("\n컬렉션 순회:")
     for fruit in fruits:
         print(f"  {fruit}")
     
-    # 인덱스가 필요한 경우
-    # Java: for (int i = 0; i < fruits.size(); i++) { ... }
-    # Go:   for i, fruit := range fruits { ... }
-    # Python: enumerate() 사용 (권장)
-    print("\nWith index (enumerate):")
-    for i, fruit in enumerate(fruits):
-        print(f"  {i}: {fruit}")
+    # enumerate - 인덱스와 값 동시에 (Java에서는 별도 카운터 필요)
+    print("\nenumerate 사용:")
+    for idx, fruit in enumerate(fruits):
+        print(f"  [{idx}] {fruit}")
     
-    # range() - Java의 IntStream.range()와 유사
-    print("\nrange(5):")
-    for i in range(5):
-        print(f"  {i}", end=" ")
-    print()
+    # dict 순회
+    person = {"name": "Kim", "age": 30}
+    print("\ndict 순회:")
+    for key, value in person.items():
+        print(f"  {key}: {value}")
     
-    # 리스트 컴프리헨션이 for문보다 빠르고 Pythonic!
-    print("\nList comprehension (더 Pythonic!):")
-    upper_fruits = [f.upper() for f in fruits]
-    print(f"  {upper_fruits}")
+    # List Comprehension (Java에 없는 기능!)
+    squares = [x**2 for x in range(10)]
+    print(f"\nList Comprehension: {squares}")
+    
+    # 조건부 List Comprehension
+    even_squares = [x**2 for x in range(10) if x % 2 == 0]
+    print(f"짝수만: {even_squares}")
 
 
 # =============================================================================
 # 5️⃣ 함수 비교
 # =============================================================================
 
-def functions_comparison() -> None:
+def functions_demo() -> None:
     """
     함수 정의 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - def 키워드 사용
-        - 반환 타입 명시 불필요 (타입 힌트로 명시 가능)
-        - 기본 인자, 키워드 인자 지원
-        - *args, **kwargs로 가변 인자
+    💡 Java/Go 개발자를 위한 팁:
+        - 반환 타입은 -> 뒤에 (Java: 메서드명 앞)
+        - 기본값 인자 지원 (Java는 오버로딩 필요)
+        - *args, **kwargs로 가변 인자 처리
     """
-    print("\n📌 함수")
-    print("-" * 50)
     
-    # Java: public int add(int a, int b) { return a + b; }
-    # Go:   func add(a, b int) int { return a + b }
-    # Python:
+    # 기본 함수
     def add(a: int, b: int) -> int:
+        """두 수를 더합니다."""
         return a + b
     
-    print(f"add(10, 20) = {add(10, 20)}")
-    
-    # 기본 인자 (Java에 없음, Go에 없음, Kotlin에 있음)
+    # 기본값 인자 (Java에서는 오버로딩 필요)
     def greet(name: str, greeting: str = "Hello") -> str:
         return f"{greeting}, {name}!"
     
-    print(f"greet('Alice') = {greet('Alice')}")
-    print(f"greet('Bob', 'Hi') = {greet('Bob', 'Hi')}")
+    # 여러 값 반환 (Java에서는 객체나 Pair 필요)
+    def get_user_info() -> tuple[str, int, str]:
+        return "Kim", 30, "Seoul"
     
-    # 키워드 인자 (명시적 인자 전달)
-    print(f"greet(greeting='Hey', name='Charlie') = {greet(greeting='Hey', name='Charlie')}")
+    # 가변 인자 (*args)
+    def sum_all(*numbers: int) -> int:
+        return sum(numbers)
     
-    # 다중 반환 (Go와 유사!)
-    def get_name_and_age() -> tuple[str, int]:
-        return "Alice", 25
+    # 키워드 가변 인자 (**kwargs)
+    def print_info(**info: str) -> None:
+        for key, value in info.items():
+            print(f"  {key}: {value}")
     
-    name, age = get_name_and_age()  # unpacking
-    print(f"\nMultiple return: name={name}, age={age}")
+    print(f"add(3, 5) = {add(3, 5)}")
+    print(f"greet('Kim') = {greet('Kim')}")
+    print(f"greet('Kim', 'Hi') = {greet('Kim', 'Hi')}")
     
-    # 일급 함수 (함수를 변수처럼!)
-    # Java에서는 함수형 인터페이스 필요, Go는 지원
-    operation = add
-    print(f"\nFirst-class function: operation(5, 3) = {operation(5, 3)}")
+    name, age, city = get_user_info()  # Unpacking
+    print(f"User: {name}, {age}, {city}")
     
-    # 람다 (Java의 람다, Go의 익명 함수)
-    multiply = lambda x, y: x * y
-    print(f"Lambda: multiply(4, 5) = {multiply(4, 5)}")
+    print(f"sum_all(1, 2, 3, 4, 5) = {sum_all(1, 2, 3, 4, 5)}")
+    
+    print("print_info:")
+    print_info(name="Kim", role="Developer", team="Backend")
 
 
 # =============================================================================
 # 6️⃣ 클래스 비교
 # =============================================================================
 
-def classes_comparison() -> None:
+def classes_demo() -> None:
     """
     클래스 정의 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - __init__이 생성자 역할
-        - self가 Java의 this
-        - getter/setter 대신 @property
-        - 접근 제어자 없음 (관례적으로 _ 사용)
+    💡 Java/Kotlin 개발자를 위한 팁:
+        - __init__이 생성자 (Java의 constructor)
+        - self가 명시적 (Java의 this는 암시적)
+        - @dataclass는 Kotlin의 data class와 유사
+        - private은 관례적으로 _prefix 사용 (강제 아님)
     """
-    print("\n📌 클래스")
-    print("-" * 50)
     
-    # Java 스타일 (장황함)
-    # public class User {
-    #     private String name;
-    #     private int age;
-    #     public User(String name, int age) { ... }
-    #     public String getName() { return name; }
-    # }
-    
-    # Python 스타일
-    class User:
+    # 전통적인 클래스
+    class Person:
+        """전통적인 Python 클래스."""
+        
         def __init__(self, name: str, age: int) -> None:
-            self.name = name  # public
-            self._age = age   # protected (관례)
+            self.name = name  # public (관례)
+            self.age = age
+            self._email: str | None = None  # protected (관례)
         
-        @property
-        def age(self) -> int:
-            """getter 역할"""
-            return self._age
-        
-        @age.setter
-        def age(self, value: int) -> None:
-            """setter 역할"""
-            if value < 0:
-                raise ValueError("Age cannot be negative")
-            self._age = value
+        def greet(self) -> str:
+            return f"Hello, I'm {self.name}"
         
         def __str__(self) -> str:
-            """Java의 toString()"""
-            return f"User(name={self.name}, age={self._age})"
+            return f"Person(name={self.name}, age={self.age})"
     
-    user = User("Alice", 25)
-    print(f"User: {user}")
-    print(f"user.name = {user.name}")
-    print(f"user.age = {user.age}")
-    
-    # @dataclass (Kotlin의 data class와 유사!)
-    from dataclasses import dataclass
-    
+    # dataclass (Kotlin의 data class, Java 14+ record)
     @dataclass
-    class Point:
-        x: float
-        y: float
+    class User:
+        """dataclass - 보일러플레이트 감소."""
+        name: str
+        age: int
+        email: str = ""  # 기본값
+        
+        def is_adult(self) -> bool:
+            return self.age >= 18
     
-    p1 = Point(10, 20)
-    p2 = Point(10, 20)
-    print(f"\ndataclass: {p1}")
-    print(f"p1 == p2: {p1 == p2}")  # 자동 __eq__ 생성!
+    person = Person("Kim", 30)
+    print(f"Person: {person}")
+    print(f"Greet: {person.greet()}")
+    
+    user = User("Lee", 25, "lee@example.com")
+    print(f"User: {user}")
+    print(f"Is adult: {user.is_adult()}")
 
 
 # =============================================================================
-# 7️⃣ 에러 처리 비교
+# 7️⃣ 예외 처리 비교
 # =============================================================================
 
-def error_handling_comparison() -> None:
+def exception_handling_demo() -> None:
     """
-    에러 처리 비교.
+    예외 처리 비교.
     
-    💡 다른 언어 개발자를 위한 팁:
-        - try-except-finally (try-catch-finally)
-        - raise (throw)
-        - Go 스타일 에러 반환도 가능
+    💡 Java/Go 개발자를 위한 팁:
+        - Java: try-catch-finally
+        - Go: if err != nil (명시적 에러 반환)
+        - Python: try-except-finally (else 블록도 있음!)
+        
+        Go 개발자: Python에서도 Optional 반환 패턴 사용 가능하지만,
+        예외 처리가 더 Pythonic합니다.
     """
-    print("\n📌 에러 처리")
-    print("-" * 50)
     
-    # Java: try { ... } catch (Exception e) { ... } finally { ... }
-    # Go:   if err != nil { return err }
-    # Python:
-    try:
-        result = 10 / 0
-    except ZeroDivisionError as e:
-        print(f"Error caught: {e}")
-    finally:
-        print("Finally block executed")
-    
-    # 커스텀 예외
-    class ValidationError(Exception):
-        pass
-    
-    def validate_age(age: int) -> int:
-        if age < 0:
-            raise ValidationError("Age cannot be negative")
-        return age
-    
-    try:
-        validate_age(-5)
-    except ValidationError as e:
-        print(f"Validation failed: {e}")
-    
-    # Go 스타일: 예외 대신 튜플 반환
-    def divide_safe(a: int, b: int) -> tuple[float | None, str | None]:
+    def divide(a: int, b: int) -> float:
+        """나눗셈 (예외 발생 가능)."""
         if b == 0:
-            return None, "division by zero"
-        return a / b, None
+            raise ValueError("Cannot divide by zero")
+        return a / b
     
-    result, err = divide_safe(10, 0)
-    if err:
-        print(f"Go-style error: {err}")
+    # try-except-else-finally
+    try:
+        result = divide(10, 2)
+    except ValueError as e:
+        print(f"에러 발생: {e}")
+    else:
+        # 예외가 발생하지 않았을 때만 실행
+        print(f"결과: {result}")
+    finally:
+        # 항상 실행
+        print("정리 작업 완료")
+    
+    # 여러 예외 처리
+    def safe_operation(data: str) -> Optional[int]:
+        try:
+            return int(data)
+        except (ValueError, TypeError):
+            return None
+    
+    print(f"safe_operation('123') = {safe_operation('123')}")
+    print(f"safe_operation('abc') = {safe_operation('abc')}")
 
 
 # =============================================================================
@@ -384,27 +345,22 @@ def error_handling_comparison() -> None:
 
 def main() -> None:
     """예제 실행."""
-    print("=" * 60)
-    print("📌 Python 문법 비교 - Java/Go/Kotlin 개발자를 위한 가이드")
-    print("=" * 60)
+    demos = [
+        ("1️⃣ 변수 선언", variable_declaration_demo),
+        ("2️⃣ 컬렉션", collections_demo),
+        ("3️⃣ 조건문", conditionals_demo),
+        ("4️⃣ 반복문", loops_demo),
+        ("5️⃣ 함수", functions_demo),
+        ("6️⃣ 클래스", classes_demo),
+        ("7️⃣ 예외 처리", exception_handling_demo),
+    ]
     
-    variable_declaration()
-    collections_comparison()
-    conditionals_comparison()
-    loops_comparison()
-    functions_comparison()
-    classes_comparison()
-    error_handling_comparison()
-    
-    print("\n" + "=" * 60)
-    print("✅ 문법 비교 완료!")
-    print("=" * 60)
-    print("\n💡 핵심 정리:")
-    print("  1. 타입 선언 불필요 (동적 타이핑)")
-    print("  2. 들여쓰기가 문법 (중괄호 없음)")
-    print("  3. 리스트 컴프리헨션이 Pythonic")
-    print("  4. @dataclass로 보일러플레이트 제거")
-    print("  5. @property로 getter/setter 대체")
+    for title, demo_func in demos:
+        print("=" * 60)
+        print(f"📌 {title}")
+        print("=" * 60)
+        demo_func()
+        print()
 
 
 if __name__ == "__main__":

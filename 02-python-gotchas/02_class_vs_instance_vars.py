@@ -1,20 +1,18 @@
-#!/usr/bin/env python3
 """
-02_class_vs_instance_vars.py - 클래스 변수 vs 인스턴스 변수 (🔴 치명적)
+02_class_vs_instance_vars.py - 🔴 클래스 변수 vs 인스턴스 변수 혼동
 
 📌 핵심 개념:
-   Python에서 클래스 본문에 선언된 변수는 "클래스 변수"로,
-   모든 인스턴스가 공유합니다. 특히 가변 객체(list, dict)일 때 문제가 됩니다.
+    Python의 클래스 변수는 모든 인스턴스가 공유합니다.
+    가변 객체를 클래스 변수로 선언하면 예기치 않은 공유가 발생합니다.
 
 🔄 다른 언어 비교:
-   - Java: 클래스 변수는 명시적으로 static 선언 필요
-   - Kotlin: 클래스 변수는 companion object 안에 선언
-   - Go: 패키지 레벨 변수와 struct 필드가 명확히 구분됨
-   - Python: 클래스 본문의 변수가 자동으로 "공유"됨
+    - Java: 인스턴스 변수와 static 변수가 명확히 구분됨
+    - Go: 구조체에 static 개념 없음
+    - Kotlin: 클래스 필드와 companion object 분리
+    - Python: 클래스 body에 선언하면 클래스 변수 (공유됨!)
 
 ⚠️ 주의사항:
-   - 클래스 본문의 가변 객체는 거의 항상 버그!
-   - Java의 static List와 비슷하지만 더 쉽게 실수함
+    Java의 인스턴스 변수처럼 보이지만, Python은 다르게 동작합니다!
 
 📚 참고: https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables
 """
@@ -23,244 +21,252 @@ from __future__ import annotations
 
 
 # =============================================================================
-# 1️⃣ ❌ 문제가 있는 코드
+# 1️⃣ ❌ 잘못된 패턴 - 클래스 변수로 가변 객체 선언
 # =============================================================================
 
-class DogBad:
+def wrong_class_variable_demo() -> None:
     """
-    ❌ 잘못된 패턴: 클래스 레벨에 가변 객체 선언.
+    ❌ 잘못된 패턴: 가변 객체를 클래스 변수로 선언.
     
-    Java 개발자가 흔히 하는 실수:
-    "인스턴스 필드처럼 보이지만 실제로는 static 필드처럼 동작"
-    """
-    
-    tricks: list[str] = []  # 모든 인스턴스가 공유!
-    
-    def __init__(self, name: str) -> None:
-        self.name = name
-    
-    def add_trick(self, trick: str) -> None:
-        self.tricks.append(trick)
-
-
-def demonstrate_problem() -> None:
-    """문제 상황 재현."""
-    print("=" * 60)
-    print("❌ 문제: 클래스 변수 공유")
-    print("=" * 60)
-    
-    dog1 = DogBad("Buddy")
-    dog2 = DogBad("Max")
-    
-    print(f"\n초기 상태:")
-    print(f"dog1.tricks = {dog1.tricks}")
-    print(f"dog2.tricks = {dog2.tricks}")
-    
-    dog1.add_trick("roll over")
-    print(f"\ndog1.add_trick('roll over') 후:")
-    print(f"dog1.tricks = {dog1.tricks}")
-    print(f"dog2.tricks = {dog2.tricks}")  # dog2도 변경됨!
-    
-    dog2.add_trick("fetch")
-    print(f"\ndog2.add_trick('fetch') 후:")
-    print(f"dog1.tricks = {dog1.tricks}")  # dog1도 변경됨!
-    print(f"dog2.tricks = {dog2.tricks}")
-    
-    print(f"\n같은 객체인가? {dog1.tricks is dog2.tricks}")  # True
-    print(f"클래스 변수: DogBad.tricks = {DogBad.tricks}")
-
-
-# =============================================================================
-# 2️⃣ 왜 이런 일이 발생하는가?
-# =============================================================================
-
-def why_this_happens() -> None:
-    """Python의 클래스 변수 동작 설명."""
-    print("\n" + "=" * 60)
-    print("📖 왜 이런 일이 발생하는가?")
-    print("=" * 60)
-    
-    print("""
-    Python 클래스 본문:
-    
-    class Dog:
-        tricks = []     # 클래스 변수 (모든 인스턴스 공유)
+    💡 Java 개발자를 위한 팁:
+        Java에서 이렇게 작성하면 인스턴스 변수입니다:
         
-        def __init__(self):
-            self.name = "..."  # 인스턴스 변수 (개별 소유)
-    
-    💡 Java와 비교:
-    
-    // Java
-    class Dog {
-        List<String> tricks = new ArrayList<>();  // 인스턴스 필드
-        static List<String> tricks = ...;         // 클래스 필드 (명시적 static)
-    }
-    
-    Python에서는 클래스 본문의 변수가 Java의 static처럼 동작!
-    단, 불변 객체(int, str)는 재할당 시 새 객체가 생기므로 괜찮음.
-    가변 객체(list, dict, set)만 문제가 됨.
-    """)
-
-
-# =============================================================================
-# 3️⃣ ✅ 올바른 해결 방법
-# =============================================================================
-
-class DogGood:
+        Java:
+            class User {
+                List<String> items = new ArrayList<>();  // 인스턴스 변수
+            }
+            
+        하지만 Python에서는 클래스 변수입니다:
+        
+        Python:
+            class User:
+                items = []  # 클래스 변수! 모든 인스턴스가 공유!
     """
-    ✅ 올바른 패턴: __init__에서 인스턴스 변수로 선언.
+    # ❌ 잘못된 클래스 정의
+    class WrongUser:
+        # 클래스 변수 - 모든 인스턴스가 공유!
+        tags: list[str] = []
+        
+        def __init__(self, name: str) -> None:
+            self.name = name
+        
+        def add_tag(self, tag: str) -> None:
+            self.tags.append(tag)
+    
+    print("❌ 클래스 변수 공유 문제:")
+    user1 = WrongUser("Alice")
+    user1.add_tag("admin")
+    print(f"  user1.tags: {user1.tags}")
+    
+    user2 = WrongUser("Bob")
+    print(f"  user2.tags (새 객체!): {user2.tags}")  # ['admin'] 이미 있음!
+    
+    user2.add_tag("member")
+    print(f"  user1.tags: {user1.tags}")  # ['admin', 'member']
+    print(f"  user2.tags: {user2.tags}")  # 같은 리스트!
+    
+    print(f"\n  user1.tags is user2.tags: {user1.tags is user2.tags}")  # True!
+    print(f"  WrongUser.tags: {WrongUser.tags}")  # 클래스 변수로 접근
+
+
+# =============================================================================
+# 2️⃣ ✅ 올바른 패턴 - __init__에서 인스턴스 변수 초기화
+# =============================================================================
+
+def correct_instance_variable_demo() -> None:
     """
+    ✅ 올바른 패턴: __init__에서 인스턴스 변수를 초기화.
+    """
+    # ✅ 올바른 클래스 정의
+    class CorrectUser:
+        def __init__(self, name: str) -> None:
+            self.name = name
+            self.tags: list[str] = []  # 인스턴스 변수 - 각 인스턴스마다 독립!
+        
+        def add_tag(self, tag: str) -> None:
+            self.tags.append(tag)
     
-    def __init__(self, name: str) -> None:
-        self.name = name
-        self.tricks: list[str] = []  # 인스턴스 변수
+    print("✅ 인스턴스 변수 사용:")
+    user1 = CorrectUser("Alice")
+    user1.add_tag("admin")
+    print(f"  user1.tags: {user1.tags}")
     
-    def add_trick(self, trick: str) -> None:
-        self.tricks.append(trick)
-
-
-def demonstrate_solution() -> None:
-    """올바른 해결책 시연."""
-    print("\n" + "=" * 60)
-    print("✅ 해결: __init__에서 인스턴스 변수로")
-    print("=" * 60)
+    user2 = CorrectUser("Bob")
+    print(f"  user2.tags (새 객체): {user2.tags}")  # [] - 독립적!
     
-    dog1 = DogGood("Buddy")
-    dog2 = DogGood("Max")
+    user2.add_tag("member")
+    print(f"  user1.tags: {user1.tags}")  # ['admin'] - 변경 없음
+    print(f"  user2.tags: {user2.tags}")  # ['member']
     
-    dog1.add_trick("roll over")
-    dog2.add_trick("fetch")
-    
-    print(f"dog1.tricks = {dog1.tricks}")  # ['roll over']
-    print(f"dog2.tricks = {dog2.tricks}")  # ['fetch']
-    print(f"같은 객체? {dog1.tricks is dog2.tricks}")  # False
+    print(f"\n  user1.tags is user2.tags: {user1.tags is user2.tags}")  # False!
 
 
 # =============================================================================
-# 4️⃣ 불변 vs 가변 객체의 차이
+# 3️⃣ 클래스 변수의 올바른 사용
 # =============================================================================
 
-class Counter:
-    """불변 객체(int)는 괜찮은 예시."""
+def proper_class_variable_demo() -> None:
+    """
+    클래스 변수의 올바른 사용 예시.
+    """
+    class Counter:
+        # ✅ 클래스 변수의 올바른 사용 - 모든 인스턴스에서 공유해야 할 때
+        instance_count: int = 0
+        
+        def __init__(self, name: str) -> None:
+            self.name = name
+            Counter.instance_count += 1  # 클래스 변수 수정
+        
+        @classmethod
+        def get_count(cls) -> int:
+            return cls.instance_count
     
-    count: int = 0  # 클래스 변수지만...
+    print("✅ 클래스 변수 올바른 사용:")
+    print(f"  초기 카운트: {Counter.instance_count}")
     
-    def __init__(self, name: str) -> None:
-        self.name = name
+    c1 = Counter("First")
+    c2 = Counter("Second")
+    c3 = Counter("Third")
     
-    def increment(self) -> None:
-        # 재할당하면 새 객체가 self.count에 바인딩됨
-        self.count += 1  # self.count = self.count + 1
+    print(f"  3개 생성 후: {Counter.instance_count}")
+    print(f"  c1.instance_count: {c1.instance_count}")  # 클래스 변수 접근 가능
+    
+    # 상수로 클래스 변수 사용
+    class Config:
+        MAX_CONNECTIONS: int = 100
+        DEFAULT_TIMEOUT: float = 30.0
+        API_VERSION: str = "v1"
+    
+    print(f"\n  Config.MAX_CONNECTIONS: {Config.MAX_CONNECTIONS}")
 
 
-def demonstrate_immutable() -> None:
-    """불변 객체의 동작."""
-    print("\n" + "=" * 60)
-    print("📌 불변 객체(int)는 다르게 동작")
-    print("=" * 60)
+# =============================================================================
+# 4️⃣ 변수 가리기 (Variable Shadowing)
+# =============================================================================
+
+def variable_shadowing_demo() -> None:
+    """
+    클래스 변수와 인스턴스 변수 가리기.
+    """
+    class Example:
+        class_var: str = "class"
+        
+        def __init__(self) -> None:
+            pass
     
-    c1 = Counter("A")
-    c2 = Counter("B")
+    print("변수 가리기 (Shadowing):")
     
-    c1.increment()
-    c1.increment()
-    c2.increment()
+    obj = Example()
+    print(f"  obj.class_var: {obj.class_var}")  # 'class' (클래스 변수)
     
-    print(f"c1.count = {c1.count}")  # 2
-    print(f"c2.count = {c2.count}")  # 1
-    print(f"Counter.count = {Counter.count}")  # 0 (클래스 변수는 변경 안됨)
+    # 인스턴스에 같은 이름으로 할당하면 인스턴스 변수가 됨
+    obj.class_var = "instance"
+    print(f"  obj.class_var (할당 후): {obj.class_var}")  # 'instance' (인스턴스 변수)
+    print(f"  Example.class_var: {Example.class_var}")  # 'class' (클래스 변수는 그대로)
     
+    # 새 객체는 여전히 클래스 변수 참조
+    obj2 = Example()
+    print(f"  obj2.class_var: {obj2.class_var}")  # 'class'
+    
+    # ⚠️ 하지만 가변 객체에서는 다르게 동작!
+    print("\n⚠️ 가변 객체 주의:")
+    
+    class MutableExample:
+        shared_list: list[str] = []
+    
+    m1 = MutableExample()
+    m1.shared_list.append("from m1")  # 클래스 변수 직접 수정!
+    
+    m2 = MutableExample()
+    print(f"  m2.shared_list: {m2.shared_list}")  # ['from m1'] - 공유됨!
+    
+    # 할당하면 인스턴스 변수로 가려짐
+    m1.shared_list = ["new list"]  # 인스턴스 변수 생성
+    print(f"  m1.shared_list (할당 후): {m1.shared_list}")
+    print(f"  m2.shared_list: {m2.shared_list}")  # 클래스 변수
+
+
+# =============================================================================
+# 5️⃣ dataclass와 클래스 변수
+# =============================================================================
+
+def dataclass_demo() -> None:
+    """
+    dataclass에서의 클래스 변수와 인스턴스 변수.
+    """
+    from dataclasses import dataclass, field
+    
+    # ❌ 잘못된 dataclass (하지만 dataclass는 자동으로 처리!)
+    @dataclass
+    class WrongDataclass:
+        name: str
+        items: list[str] = field(default_factory=list)  # ✅ factory 사용
+    
+    print("dataclass의 default_factory:")
+    d1 = WrongDataclass("Alice")
+    d1.items.append("item1")
+    
+    d2 = WrongDataclass("Bob")
+    print(f"  d1.items: {d1.items}")
+    print(f"  d2.items: {d2.items}")  # [] - 독립적!
+    
+    # 클래스 변수는 ClassVar로 명시
+    from typing import ClassVar
+    
+    @dataclass
+    class ConfigurableUser:
+        name: str
+        email: str = ""
+        
+        # ClassVar - 명시적으로 클래스 변수
+        default_role: ClassVar[str] = "user"
+        instance_count: ClassVar[int] = 0
+        
+        def __post_init__(self) -> None:
+            ConfigurableUser.instance_count += 1
+    
+    print("\n  ClassVar 사용:")
+    u1 = ConfigurableUser("Kim")
+    u2 = ConfigurableUser("Lee")
+    print(f"  instance_count: {ConfigurableUser.instance_count}")
+
+
+# =============================================================================
+# 6️⃣ 요약
+# =============================================================================
+
+def summary() -> None:
+    """
+    클래스 변수 vs 인스턴스 변수 요약.
+    """
     print("""
-    💡 설명:
-    c1.count += 1 은 실제로 c1.count = c1.count + 1
-    
-    1. c1.count를 읽으면 → 클래스 변수 Counter.count(0)를 찾음
-    2. 0 + 1 = 1
-    3. c1.count = 1 → 새로운 인스턴스 변수 생성!
-    
-    결과적으로 c1과 c2는 각자의 인스턴스 변수를 갖게 됨.
-    하지만 이는 "우연히" 동작하는 것이므로 권장하지 않음!
-    """)
-
-
-# =============================================================================
-# 5️⃣ dataclass 사용 (권장)
-# =============================================================================
-
-from dataclasses import dataclass, field
-
-
-@dataclass
-class DogDataclass:
-    """
-    ✅ 가장 권장하는 패턴: dataclass + field(default_factory).
-    
-    Kotlin의 data class와 유사.
-    """
-    
-    name: str
-    tricks: list[str] = field(default_factory=list)  # 매 인스턴스마다 새 리스트
-    
-    def add_trick(self, trick: str) -> None:
-        self.tricks.append(trick)
-
-
-def demonstrate_dataclass() -> None:
-    """dataclass 사용 예시."""
-    print("\n" + "=" * 60)
-    print("✅ 최선: dataclass + field(default_factory)")
-    print("=" * 60)
-    
-    dog1 = DogDataclass("Buddy")
-    dog2 = DogDataclass("Max")
-    
-    dog1.add_trick("roll over")
-    dog2.add_trick("fetch")
-    
-    print(f"dog1 = {dog1}")
-    print(f"dog2 = {dog2}")
-    print(f"같은 tricks? {dog1.tricks is dog2.tricks}")  # False
-
-
-# =============================================================================
-# 6️⃣ 클래스 변수의 올바른 사용처
-# =============================================================================
-
-class Config:
-    """
-    ✅ 클래스 변수의 올바른 사용: 상수, 불변 설정.
-    """
-    
-    # 상수 (대문자)
-    MAX_CONNECTIONS: int = 100
-    DEFAULT_TIMEOUT: float = 30.0
-    SUPPORTED_FORMATS: tuple[str, ...] = ("json", "xml", "csv")  # 불변 tuple
-    
-    def __init__(self, timeout: float | None = None) -> None:
-        self.timeout = timeout or self.DEFAULT_TIMEOUT
-
-
-def demonstrate_proper_class_vars() -> None:
-    """클래스 변수의 올바른 사용."""
-    print("\n" + "=" * 60)
-    print("📌 클래스 변수의 올바른 사용")
-    print("=" * 60)
-    
-    print(f"Config.MAX_CONNECTIONS = {Config.MAX_CONNECTIONS}")
-    print(f"Config.SUPPORTED_FORMATS = {Config.SUPPORTED_FORMATS}")
-    
-    c1 = Config()
-    c2 = Config(timeout=60.0)
-    
-    print(f"c1.timeout = {c1.timeout}")
-    print(f"c2.timeout = {c2.timeout}")
-    
-    print("""
-    💡 클래스 변수 사용 가이드:
-    ✅ 상수 (불변): int, float, str, tuple, frozenset
-    ✅ 클래스 메타데이터
-    ❌ 가변 객체: list, dict, set → 반드시 __init__에서!
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║            🔴 클래스 변수 vs 인스턴스 변수 규칙                ║
+    ╠═══════════════════════════════════════════════════════════════╣
+    ║                                                               ║
+    ║  Python의 변수 위치:                                          ║
+    ║                                                               ║
+    ║    class MyClass:                                             ║
+    ║        class_var = []      # ← 클래스 변수 (모든 인스턴스 공유)║
+    ║                                                               ║
+    ║        def __init__(self):                                    ║
+    ║            self.instance_var = []  # ← 인스턴스 변수 (독립적) ║
+    ║                                                               ║
+    ║  ❌ 하지 마세요:                                               ║
+    ║     class User:                                               ║
+    ║         items = []  # 모든 인스턴스가 공유!                   ║
+    ║                                                               ║
+    ║  ✅ 이렇게 하세요:                                             ║
+    ║     class User:                                               ║
+    ║         def __init__(self):                                   ║
+    ║             self.items = []  # 각 인스턴스별 독립             ║
+    ║                                                               ║
+    ║  💡 클래스 변수가 적절한 경우:                                 ║
+    ║     - 상수 (MAX_SIZE, DEFAULT_VALUE)                          ║
+    ║     - 인스턴스 카운터                                         ║
+    ║     - 모든 인스턴스가 공유해야 하는 설정                      ║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝
     """)
 
 
@@ -270,34 +276,26 @@ def demonstrate_proper_class_vars() -> None:
 
 def main() -> None:
     """예제 실행."""
-    demonstrate_problem()
-    why_this_happens()
-    demonstrate_solution()
-    demonstrate_immutable()
-    demonstrate_dataclass()
-    demonstrate_proper_class_vars()
+    demos = [
+        ("1️⃣ ❌ 잘못된 패턴", wrong_class_variable_demo),
+        ("2️⃣ ✅ 올바른 패턴", correct_instance_variable_demo),
+        ("3️⃣ 클래스 변수 올바른 사용", proper_class_variable_demo),
+        ("4️⃣ 변수 가리기", variable_shadowing_demo),
+        ("5️⃣ dataclass", dataclass_demo),
+        ("6️⃣ 요약", summary),
+    ]
     
-    print("\n" + "=" * 60)
-    print("💡 핵심 정리")
     print("=" * 60)
-    print("""
-    ❌ 하지 말 것:
-       class Foo:
-           items = []  # 모든 인스턴스가 공유!
+    print("🔴 클래스 변수 vs 인스턴스 변수")
+    print("=" * 60)
+    print()
     
-    ✅ 해야 할 것:
-       class Foo:
-           def __init__(self):
-               self.items = []  # 인스턴스마다 개별 소유
-    
-    ✅✅ 최선 (dataclass):
-       @dataclass
-       class Foo:
-           items: list = field(default_factory=list)
-    
-    🔍 린터 설정:
-       - pylint: class-variable-slots-conflict
-    """)
+    for title, demo_func in demos:
+        print("-" * 60)
+        print(f"📌 {title}")
+        print("-" * 60)
+        demo_func()
+        print()
 
 
 if __name__ == "__main__":
