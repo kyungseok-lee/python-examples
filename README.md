@@ -21,6 +21,12 @@ Python 백엔드 전문가가 되기 위한 체계적인 학습 프로젝트입�
 
 ## 📚 커리큘럼 구성
 
+### 🚀 00. Quick Start (신규!)
+> **10분 안에 Python 핵심 파악** - 다른 언어 개발자를 위한 빠른 투어
+
+- **01_syntax_comparison**: Java/Go/Kotlin과 Python 문법 비교
+- **02_quick_tour**: Python 핵심 기능 빠른 투어 (컴프리헨션, 제너레이터, 데코레이터)
+
 ### 01. 기본 문법 (Basics)
 Python의 기초를 탄탄히 다지는 단계입니다.
 
@@ -32,6 +38,17 @@ Python의 기초를 탄탄히 다지는 단계입니다.
 - **06_data_structures**: list, tuple, dict, set
 - **07_strings**: 문자열 조작, 포매팅, 정규표현식
 - **08_classes_basic**: 클래스, 인스턴스, 메서드, 상속
+
+### ⚠️ 02. Python Gotchas (신규!)
+> **다른 언어 개발자가 가장 많이 실수하는 패턴** - 필독!
+
+- **01_mutable_default_args**: 가변 기본 인자 함정 (🔴 치명적)
+- **02_class_vs_instance_vars**: 클래스 변수 vs 인스턴스 변수 (🔴 치명적)
+- **03_is_vs_equals**: is vs == 차이 (🟠 중요)
+- **04_late_binding_closures**: 클로저 Late Binding (🟠 중요)
+- **05_shallow_vs_deep_copy**: 얕은 복사 vs 깊은 복사 (🟡 주의)
+- **06_variable_scope_leaking**: 변수 스코프 누출 (🟡 주의)
+- **07_circular_reference**: 순환 참조와 메모리 (🟡 주의)
 
 ### 02. 중급 개념 (Intermediate)
 실무에서 자주 사용하는 중급 기술을 학습합니다.
@@ -55,14 +72,26 @@ Python의 심화 기능과 성능 최적화를 다룹니다.
 - **05_testing**: pytest, fixtures, mocking
 
 ### 04. 백엔드 전문가 (Backend Expert)
-실전 백엔드 개발에 필요한 모든 기술을 마스터합니다.
+실전 백엔드 개발에 필요한 핵심 기술을 마스터합니다.
 
-#### API 개발
 - **01_fastapi_basics**: FastAPI 기본, 라우팅, 요청/응답
 - **02_pydantic_models**: Pydantic v2, 데이터 검증, 시리얼라이제이션
 - **03_clean_architecture**: 계층 분리, 의존성 역전, Protocol
 
+### 📋 99. Cheatsheets (신규!)
+> 빠른 참조용 치트시트
+
+- **syntax_cheatsheet.md**: Python 문법 빠른 참조
+- **gotchas_cheatsheet.md**: 함정 패턴 빠른 참조
+- **performance_cheatsheet.md**: 성능 최적화 팁
+
 ## 🚀 빠른 시작
+
+### 권장 학습 순서 (다른 언어 경험자)
+
+```
+00-quick-start (10분) → 02-python-gotchas (30분) → 나머지 순차 학습
+```
 
 ### 1. Python 설치 확인
 ```bash
@@ -75,8 +104,8 @@ Python이 없다면? → **[상세 설치 가이드 보기](SETUP.md)**
 
 ```bash
 # 1) 프로젝트 클론
-git clone https://github.com/kyungseok-lee/python-by-examples.git
-cd python-by-examples
+git clone https://github.com/kyungseok-lee/python-examples.git
+cd python-examples
 
 # 2) 가상환경 설정 (권장)
 python -m venv venv
@@ -87,16 +116,18 @@ venv\Scripts\activate
 # macOS/Linux
 source venv/bin/activate
 
-# 3) 첫 예제 실행 (의존성 설치 불필요!)
-cd 01-basics
-python 01_variables_and_types.py
+# 3) Quick Start 실행 (의존성 설치 불필요!)
+cd 00-quick-start
+python 01_syntax_comparison.py
+python 02_quick_tour.py
 ```
 
-### 3. 전체 예제 실행
+### 3. 함정(Gotchas) 학습 (중요!)
 ```bash
-# 기본 문법 전체 실행
-cd 01-basics
-python run_all.py
+cd 02-python-gotchas
+python 01_mutable_default_args.py
+python 02_class_vs_instance_vars.py
+# ... 나머지도 실행
 ```
 
 ### 4. FastAPI 서버 실행 (백엔드 과정)
