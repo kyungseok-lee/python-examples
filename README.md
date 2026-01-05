@@ -1,6 +1,15 @@
 # Python Backend Expert Learning Path
 
+> **대상:** Java/Go/Kotlin 등 다른 언어 경험이 있는 개발자가 Python을 빠르게 학습하기 위한 예제 중심 프로젝트입니다.
+
 Python 백엔드 전문가가 되기 위한 체계적인 학습 프로젝트입니다.
+
+## 🎯 학습 목표
+
+- Python 문법과 관용구(Idioms)를 빠르게 익히기
+- 다른 언어와의 차이점 및 Python 특유의 함정(Gotchas) 이해
+- 실무에서 바로 적용 가능한 백엔드 패턴 습득
+- 메모리/GC 특성을 이해하고 성능 최적화 방법 학습
 
 ## 🔧 기술 스택
 
@@ -165,6 +174,15 @@ class User(BaseModel):
 - [Pydantic v2 Documentation](https://docs.pydantic.dev/latest/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - [Python Memory Management](https://docs.python.org/3/c-api/memory.html)
+
+## 📋 프로젝트 개선 가이드
+
+이 프로젝트의 구조와 개선 방향에 대한 상세 가이드는 **[PROMPT_ENGINEERING.md](PROMPT_ENGINEERING.md)**를 참고하세요.
+
+- 전문가 대상 학습 콘텐츠 작성 가이드
+- 폴더 구조 제안
+- 예제 파일 템플릿
+- 다른 언어와의 비교 포인트
 
 ## 🤝 기여
 
